@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.MaskerPane?>
+<AnchorPane id="AnchorPaneHomeId" fx:id="home" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.91"
+            xmlns:fx="http://javafx.com/fxml/1" GridPane.vgrow="ALWAYS"
+            fx:controller="fr.perso.nfelix.app.ui.controllers.HomeController">
+  <VBox alignment="TOP_CENTER" minHeight="400" minWidth="400" prefHeight="200.0" prefWidth="200.0"
+        AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+        AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+        GridPane.vgrow="ALWAYS">
+    <!--Menu -->
+    <MenuBar fx:id="homeMenuBar" nodeOrientation="LEFT_TO_RIGHT" prefWidth="600.0">
+
+      <!-- Fichier -->
+      <Menu text="%menu.main.text" fx:id="toolMenuID">
+        <MenuItem text="%menu.main.preferences.text" onAction="#goToSettings" fx:id="preferencesMenuItem">
+          <accelerator>
+            <KeyCodeCombination control="DOWN" code="P" alt="UP" shift="UP" shortcut="UP" meta="UP"/>
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem/>
+        <MenuItem text="%menu.main.quit.text" onAction="#quitApp" fx:id="exitMenuItem">
+          <accelerator>
+            <KeyCodeCombination alt="UP" code="Q" control="DOWN" shift="UP" shortcut="UP" meta="UP"/>
+          </accelerator>
+        </MenuItem>
+      </Menu>
+
+      <!-- Aide/A propos -->
+      <Menu text="%menu.help.text" fx:id="helpMenuId">
+        <MenuItem text="%menu.help.export.mode" fx:id="modeExpertMenuItem" onAction="#activateExpertMode"/>
+        <SeparatorMenuItem/>
+        <MenuItem text="%menu.help.userguide" fx:id="userGuideMenuItem" onAction="#showUserGuide">
+          <accelerator>
+            <KeyCodeCombination code="F1" alt="UP" control="UP" shift="UP" shortcut="UP" meta="UP"/>
+          </accelerator>
+        </MenuItem>
+        <MenuItem text="%menu.help.logs" fx:id="logsMenuItem" onAction="#showLogs">
+          <accelerator>
+            <KeyCodeCombination code="L" alt="UP" control="DOWN" shift="UP" shortcut="UP" meta="UP"/>
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem/>
+        <MenuItem text="%menu.help.about.text" fx:id="aboutMenuItem" onAction="#showAboutBox">
+          <accelerator>
+            <KeyCodeCombination code="F1" alt="UP" control="DOWN" shift="UP" shortcut="UP" meta="UP"/>
+          </accelerator>
+        </MenuItem>
+      </Menu>
+    </MenuBar>
+
+    <!--Main content -->
+    <StackPane fx:id="insideMainPane">
+      <GridPane AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" vgap="10" maxHeight="Infinity" maxWidth="Infinity">
+        <columnConstraints>
+          <ColumnConstraints hgrow="ALWAYS" minWidth="150.0" prefWidth="15.0" maxWidth="150.0"/>
+          <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+        <padding>
+          <Insets top="10" right="10" left="10"/>
+        </padding>
+
+        <HBox GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2" spacing="10">
+          <Label fx:id="databaseStatus" text="%label.database.status"/>
+          <Button fx:id="statusDatabaseBut"/>
+        </HBox>
+        <Separator GridPane.columnSpan="2" GridPane.rowIndex="1"/>
+
+        <Label styleClass="titleLabel" text="toto" GridPane.columnSpan="2" GridPane.rowIndex="5"/>
+        <HBox GridPane.columnSpan="2" GridPane.rowIndex="6" spacing="10">
+          <Button fx:id="runButton" text="%button.run.import" onAction="#runJobs"/>
+        </HBox>
+
+      </GridPane>
+
+      <MaskerPane fx:id="maskPane" visible="false"/>
+    </StackPane>
+
+    <!--progress content -->
+    <fx:include fx:id="jobProgressFragment" source="fragments/jobWorkFragment.fxml"/>
+
+  </VBox>
+</AnchorPane>

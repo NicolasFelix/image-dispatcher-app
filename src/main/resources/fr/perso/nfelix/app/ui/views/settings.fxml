@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.PropertySheet?>
+<AnchorPane id="AnchorPaneSettingsId" fx:id="settings" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.91"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="fr.perso.nfelix.app.ui.controllers.SettingsController">
+  <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+        AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <MenuBar>
+      <Menu text="%menu.quit.text" fx:id="mainMenuID">
+        <MenuItem mnemonicParsing="false" fx:id="quitButton" text="%menu.item.quit.text" onAction="#quitWithoutSaving">
+          <accelerator>
+            <KeyCodeCombination code="Q" alt="UP" control="DOWN" shift="UP" shortcut="UP" meta="UP"/>
+          </accelerator>
+        </MenuItem>
+        <SeparatorMenuItem/>
+        <MenuItem mnemonicParsing="false" fx:id="saveButton" text="%menu.item.quit.and.save.text" onAction="#saveAndQuit">
+          <accelerator>
+            <KeyCodeCombination code="S" alt="UP" control="DOWN" shift="UP" shortcut="UP" meta="UP"/>
+          </accelerator>
+        </MenuItem>
+      </Menu>
+    </MenuBar>
+    <PropertySheet fx:id="propertyListItem"/>
+  </VBox>
+</AnchorPane>

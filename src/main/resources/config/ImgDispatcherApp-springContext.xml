@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress SpringPlaceholdersInspection, DuplicatedBeanNamesInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="applicationContextHolder" class="fr.perso.nfelix.app.utils.spring.SpringApplicationContextHolder" lazy-init="false"/>
+
+  <bean id="abstractService" class="fr.perso.nfelix.app.ui.services.AbstractThreadedService" abstract="true">
+    <property name="threadCoefficient" value="${application_threadCoefficent:10}"/>
+    <property name="dumpStep" value="${exchange.dump.step:500}"/>
+  </bean>
+
+  <bean id="jobCallback" class="fr.perso.nfelix.app.ui.services.JobCallback"/>
+
+
+  <beans profile="!fakeProfile">
+    <bean name="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="locations">
+        <list>
+          <value>file:${config.folder}settings.properties</value>
+          <value>classpath:config/application.properties</value>
+          <value>file:${config.folder}private-additional.properties</value>
+        </list>
+      </property>
+    </bean>
+
+  </beans>
+
+  <!-- load at least this file -->
+  <beans profile="fakeProfile">
+    <bean name="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="locations">
+        <list>
+          <value>classpath:config/application.properties</value>
+        </list>
+      </property>
+    </bean>
+  </beans>
+
+</beans>

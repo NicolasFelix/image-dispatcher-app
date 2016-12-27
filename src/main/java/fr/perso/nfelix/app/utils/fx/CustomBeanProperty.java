@@ -1,0 +1,64 @@
+package fr.perso.nfelix.app.utils.fx;
+
+import java.beans.PropertyDescriptor;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.property.BeanProperty;
+
+/**
+ * @author N.FELIX
+ */
+public class CustomBeanProperty extends BeanProperty {
+
+  private Map<String, Object> additionalProps = null;
+
+  public CustomBeanProperty(Object bean, PropertyDescriptor propertyDescriptor) {
+    super(bean, propertyDescriptor);
+
+    initAdditionalProps(propertyDescriptor);
+  }
+
+  private void initAdditionalProps(PropertyDescriptor propertyDescriptor) {
+    if(propertyDescriptor != null && propertyDescriptor instanceof CustomPropertyDescriptor) {
+      final Map<String, Object> addedProps = ((CustomPropertyDescriptor) propertyDescriptor).getAdditionalProps();
+      if(addedProps != null) {
+        for(Map.Entry<String, Object> e : addedProps.entrySet()) {
+          addProperty(e.getKey(), e.getValue());
+        }
+      }
+    }
+  }
+
+  @Override
+  public IPropertySheetBean getBean() {
+    return (IPropertySheetBean) super.getBean();
+  }
+
+  @Override
+  public String getCategory() {
+    return getBean().getCategory();
+  }
+
+  private void addProperty(final String key, final Object value) {
+    if(StringUtils.isBlank(key)) {
+      return;
+    }
+
+    if(additionalProps == null) {
+      additionalProps = new HashMap<>();
+    }
+    additionalProps.put(key, value);
+  }
+
+  public Object getProperty(final String key) {
+    if(additionalProps == null) {
+      return null;
+    }
+    if(StringUtils.isBlank(key)) {
+      return null;
+    }
+
+    return additionalProps.get(key);
+  }
+}

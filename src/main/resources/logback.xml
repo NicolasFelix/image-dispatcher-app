@@ -1,0 +1,176 @@
+<configuration debug="true">
+  <property resource="logback.properties"/>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>${log_stdout_level:-INFO}</level>
+    </filter>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{HH:mm:ss.SSS} %-5level [%thread][%file:%line] %msg%n%rEx</Pattern>
+    </encoder>
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator name="loggingTaskEval">
+        <expression>
+          return (logger.contains("TimingLogger") || logger.contains("groovyLog") || logger.contains("scriptLog") || logger.startsWith("templateLog"));
+        </expression>
+      </evaluator>
+      <OnMatch>DENY</OnMatch>
+      <OnMismatch>ACCEPT</OnMismatch>
+    </filter>
+  </appender>
+
+  <appender name="main" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log_path}/${project_filename:-exchangeApp}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <FileNamePattern>${log_path}/${project_filename:-exchange}_%i.log.zip</FileNamePattern>
+      <MinIndex>1</MinIndex>
+      <MaxIndex>10</MaxIndex>
+    </rollingPolicy>
+
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>50MB</MaxFileSize>
+    </triggeringPolicy>
+
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{HH:mm:ss.SSS} %-5level [%thread][%logger{0}:%line] %msg%n%rEx</Pattern>
+    </encoder>
+
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator name="loggingTaskEval">
+        <expression>
+          return (logger.contains("TimingLogger") || logger.contains("scriptLog") || logger.startsWith("templateLog"));
+        </expression>
+      </evaluator>
+      <OnMatch>DENY</OnMatch>
+      <OnMismatch>ACCEPT</OnMismatch>
+    </filter>
+  </appender>
+
+  <appender name="script" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log_path}/${project_filename:-exchangeApp}_scripts.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <FileNamePattern>${log_path}/${project_filename:-exchange}_%i.log.zip</FileNamePattern>
+      <MinIndex>1</MinIndex>
+      <MaxIndex>5</MaxIndex>
+    </rollingPolicy>
+
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%d{HH:mm:ss.SSS} %-5level [%thread][%logger{0}:%line] %msg%n%rEx</Pattern>
+    </encoder>
+
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>${log_script_level:-ERROR}</level>
+    </filter>
+
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator name="loggingTaskEval">
+        <expression>
+          return (logger.contains("scriptLog") || logger.startsWith("templateLog"));
+        </expression>
+      </evaluator>
+      <OnMatch>ACCEPT</OnMatch>
+      <OnMismatch>DENY</OnMismatch>
+    </filter>
+  </appender>
+
+  <logger name="com.digitech.common.dal.dto.AbstractParameters" additivity="false">
+    <level value="WARN"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.dozer" additivity="false">
+    <level value="${log_level_dozer:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.apache" additivity="false">
+    <level value="${log_level_apache_commons:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.eclipse" additivity="false">
+    <level value="${log_level_eclipse:-OFF}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.ajax4jsf" additivity="false">
+    <level value="${log_level_ajax4jsf:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.richfaces" additivity="false">
+    <level value="${log_level_richfaces:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="com.sun.webui.jsf" additivity="false">
+    <level value="${log_level_webuijsf:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="de.northbit" additivity="false">
+    <level value="${log_level_jfo:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.apache.fop" additivity="false">
+    <level value="${log_level_jfo:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+
+  <!-- Spring -->
+  <logger name="org.springframework" additivity="false">
+    <level value="${log_level_springframework:-WARN}"/>
+    <appender-ref ref="main"/>
+    <appender-ref ref="console"/>
+  </logger>
+
+  <!-- Hibernate -->
+  <logger name="com.digitech.common.dal.hibernate" additivity="false">
+    <level value="${log_level_hibernate:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.hibernate" additivity="false">
+    <level value="${log_level_hibernate:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.hibernate.SQL" additivity="false">
+    <level value="${log_level_hibernate_SQL:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.hibernate.type" additivity="false">
+    <level value="${log_level_hibernate_type:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.hibernate.cache" additivity="false">
+    <level value="${log_level_hibernate_cache:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.hibernate.transaction" additivity="false">
+    <level value="${log_level_hibernate_transaction:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.hibernate.jdbc" additivity="false">
+    <level value="${log_level_hibernate_jdbc:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.hibernate.tool.hbm2ddl" additivity="false">
+    <level value="${log_level_hibernate_hbm2ddl:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="org.icepdf" additivity="false">
+    <level value="${log_level_icepdf:-WARN}"/>
+    <appender-ref ref="main"/>
+  </logger>
+  <logger name="net.sf.ehcache" additivity="false">
+    <level value="${log_level_cache:-FATAL}"/>
+  </logger>
+
+  <!-- specific import -->
+  <logger name="com.digitech.city.model.entity.impl.formatter" additivity="false">
+    <level value="${log_level}"/>
+  </logger>
+
+  <root>
+    <level value="${log_level}"/>
+    <appender-ref ref="main"/>
+    <appender-ref ref="console"/>
+  </root>
+
+</configuration>

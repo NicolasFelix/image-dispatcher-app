@@ -1,0 +1,8 @@
+.view {
+    /*-fx-background-color: darkmagenta;*/
+}
+
+#mainMenuID > .label {
+    -fx-graphic: url("../images/menu/exchangeApp-16x16.png");
+}
+

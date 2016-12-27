@@ -1,0 +1,256 @@
+= ExchangeApp: Manuel de configuration de l'import *CityWeb*
+:experimental:
+:hardbreaks:
+:img_ok: image:ok-16x16.png["OK",width={img-prio-width}]
+:img_warn: image:warn-16x16.png["WARN",width={img-prio-width}]
+:img_ko: image:ko-16x16.png["KO",width={img-prio-width}]
+
+Digitech
+v1.0.0, 01/09/2016
+//:Author: Nicolas_Félix
+
+// Manuel de configuration de l'import ECW vers *CityWeb*
+
+== Introduction
+
+Le présent document décrit le module *ExchangeApp* permettant
+
+* l'import de fichier *_ECW_* dans *CityWeb*
+* la génération du [underline]#rapport de migration# (différentiel *City2* / *CityWeb*)
+
+[NOTE]
+====
+Ce module ajoute une IHM (*_I_* nterface *_H_* omme *_M_* achine) au module *CityExchange*
+permettant de s'affranchir du paramétrage via les fichiers _properties_.
+====
+
+== Pré-requis
+
+L'application *_CityWeb_* doit avoir été installée et configurée avant toute opération d'import,
+cela sous-entend notamment :
+
+* la définition de la (ou des) mairie(s)
+* le chargement des modèles en dernière version (si différents de ceux du package de base)
+
+<<<
+
+== Installation
+
+L'installation s'effectue via l'installShield fourni,
+la seule option disponible étant le choix du répertoire d'installation.
+
+Comme évoqué dans le chaptire précédent, une *jre* est automatiquement installée [underline]#pour et seulement pour# ce module.
+Toute autre application déjà disponible sur le poste [underline]#ne sera pas impactée# par cette jre.
+
+<<<
+
+== ExchangeApp
+
+Après avoir lancé l'application, l'écran suivant est affiché
+
+image::home1.png[scaledwidth=75%, caption="Figure 1: ", title="Ecran principal de l'application"]
+
+Celui-ci est composé de 4 zones:
+
+. Le menu de l'application permettant notamment d'accéder aux autres écrans
+. Zone donnant le status de connexion aux bases de données *City2* et *CityWeb*.
+Ce status est données par les 3 icones suivants:
+* {img_ok} : connexion effectuée
+* {img_warn} : paramètres invalides/insuffisants pour effectuer une connexion
+* {img_ko} : connexion *NON* effectuée
+[start=3]
+. Tableau des correspondances mairies entre *City2* et *CityWeb*
+. Zone de lancement de l'import
+
+Le menu *Aide* permet
+
+image::home5.png[scaledwidth=75%, caption="Figure 2: ", title="Aide"]
+
+* d'activer le mode *EXPERT*
+* d'afficher l'aide (ce document) (raccourci kbd:[F1])
+* d'ouvrir le fichier _log_/_traces_ (raccourci kbd:[Ctrl + L])
+* d'ouvrir la fenêtre _à propos de_ (raccourci kbd:[Ctrl + F1])
+
+=== Préférences/Options
+
+L'écran des options de l'application est accessible via le menu *Fichier* / *Préférences/Options*
+
+image::settings1.png[scaledwidth=75%, caption="Figure 3: ", title="Menu d'accès aux préférences"]
+
+ou à l'aide du raccourci kbd:[Ctrl + P]
+
+Cet écran se compose de 4 sections suivantes :
+
+==== Connexion City2
+
+image::settingsCity2.png[scaledwidth=75%, caption="Figure 4: ", title="Informations de connexion à City2"]
+
+Cette section permet de renseigner les informations de connexion à la base de données *City2* :
+
+. *Url* : url jdbc de connexion
+. *Utilisateur* : utilisateur de connexion à la base
+. *Mot de passe* : mot de passe de l'utilisateur de connexion à la base
+. *Tester* : Bouton permettant de tester les paramètres définis
+
+==== Connexion CityWeb
+
+image::settingsCityWeb.png[scaledwidth=75%, caption="Figure 5: ", title="Informations de connexion à CityWeb"]
+
+Cette section permet de renseigner les informations de connexion à la base de données *CityWeb*.
+Ceux-ci sont décrits dans le <<Connexion City2,paragraphe précédent>>
+
+==== Options d'import
+
+image::settingsImport.png[scaledwidth=75%, caption="Figure 6: ", title="Options d'import"]
+
+Cette section permet de renseigner les nombreux paramètres disponibles pour l'import des donneés [underline]#hors définition des modes (étapes) disponible sur l'écran d'accueil# :
+
+Définition des répertoires :
+
+. Répertoire contenant les fichiers *ECW* issues de City2.
+. Répertoire vers lequel les fichiers *ECW* seront extraits.
+. Répertoire vers lequel les fichiers correctement traités seront déplacés
+. Répertoire vers lequel les fichiers non traités (_avec erreur_) seront déplacés
+
+Mode enrichissement:
+[start=5]
+. Activer ce mode
+. Autoriser la mise à jour des personnes
+. Autoriser la mise à jour des fichiers
+. Autoriser la mise à jour de l'historique
+. Autoriser la mise à jour des notes/commentaires
+
+Autres options
+[start=10]
+. Autoriser l'import des actes brouillons
+. Enchainer les modes sélectionnés. Si non coché (et que 2 modes sont sélectionnés), un seul  sera réellement exécuté.
+. Traiter tous les fichiers présents. Ce mode n'empêche pas l'arrêt de l'import en cas d'erreur.
+. *Réservé Digitech*: Enregistrement des informations d'import en base de données
+. *Réservé Digitech*: Forcer l'import des actes
+
+==== Options du rapport de migration
+
+image::settingsReport.png[scaledwidth=75%, caption="Figure 7: ", title="Options rapport de migration"]
+
+2 options sont disponibles dans cette section :
+
+. Le choix du format de sortie (_pdf_, _html_, _xlsx_)
+. *Réservé Digitech*: Un filtre (*_SQL_*) additionnel permettant de limiter la génération du rapport.
+
+<<<
+
+=== Import de données
+
+L'écran principal permet d'exécuter l'import si la paramétrage a été correctement effectué.
+
+==== Contrôle des modèles
+
+image::mapping1.png[scaledwidth=75%, caption="Figure 8: ", title="Analyse du mapping"]
+
+Le menu ci-dessus permet de vérifier que tous les modèles d'acte et mentions de *_City2_* ont une correspondance dans le système *_CityWeb_*.
+Après exécution, un rapport _html_ est automatiquement affichée (dans l'exemple ci-dessous, aucun modèle n'est manquant).
+
+image::mapping2.png[scaledwidth=75%, caption="Figure 9: ", title="Analyse du mapping"]
+
+==== Correspondance de Mairies City2 <--> CityWeb
+
+image::home2.png[scaledwidth=75%, caption="Figure 10: ", title="Correspondance de mairies"]
+
+[WARNING]
+====
+Ce tableau n'est accessible [underline]#que si# les connexions aux bases *City2* [underline]#et# *CityWeb* sont [underline]#effectives#.
+====
+
+Ce tableau permet de faire la passerelle entre les mairies de la base *City2* et celles de *CityWeb*.
+La troisième colonne (_Label CITYWEB_) permet de sélectionner la mairie correspondante.
+
+[NOTE]
+====
+L'application essaye d'associer automatiquement ces mairies. Il vous faut donc les modifier en cas d'associations erronées ou manquantes.
+====
+
+==== Import
+
+image::home3.png[scaledwidth=75%, caption="Figure 11: ", title="Section import"]
+
+L'ensemble de la configuration effectuée, il est temps de lancer l'import...
+
+Après avoir choisi le ou les modes désirés
+
+image::home4.png[scaledwidth=75%, caption="Figure 12: ", title="Choix des Modes"]
+
+parmi :
+
+* *UNZIP*: active la décompression des fichiers *ECW*
+* *IMPORT_CERTIFICATE*: active l'import.
+
+Une fois un mode sélectionné, le bouton *_Lancer l'import_* est disponible.
+Un clic sur celui-ci affiche d'abord l'écran de patience suivant :
+
+image::job1.png[scaledwidth=75%, caption="Figure 13: ", title="Initialisaton de l'import"]
+
+Cet écran sera présenté les quelques secondes nécessaires au chargement de la configuration et de la mise en cache de données nécessaires au bon fonctionnement de l'import.
+
+Cette initialisation faite, une nouvelle section apparait :
+
+image::job2.png[scaledwidth=75%, caption="Figure 14: ", title="Import en cours..."]
+
+. Bouton (*Stopper*) permettant de stopper l'import. Cet arret ne sera effectif qu'à la fin du traitement d'un fichier *ECW*.
+. Zone indiquant le mode en cours d'exécution.
+. Barre de progression du traitement du fichier *ECW* ([underline]#seulement# pour le mode *IMPORT_CERTIFICAT*)
+. Zone affichant des informations sur l'avancement de l'import
+
+<<<
+
+=== Rapport de migration
+
+L'écran permettant de générer le rapport de migration est accessible via le menu *Fichier* / *Rapport de migration*
+
+image::migration1.png[scaledwidth=75%, caption="Figure 15: ", title="Menu d'accès au rapport de migration"]
+
+ou à l'aide du raccourci kbd:[Ctrl + 1].
+
+[WARNING]
+====
+Ce menu n'est accessible [underline]#que si# les connexions aux bases *City2* [underline]#et# *CityWeb* sont [underline]#effectives#.
+====
+
+L'écran suivant propose :
+
+image::migration2.png[scaledwidth=75%, caption="Figure 16: ", title="Ecran de génération du rapport de migration"]
+
+. la version du moteur *_Birt_* utilisé pour générer le rapport (pour information)
+. un bouton permettant de lancer la génération du rapport.
+. une zone affichant des informations sur l'avancement de la génération
+
+[NOTE]
+====
+Cette opération ne peut être interrompue et prend plusieurs minutes pour être finalisée. Soyez patient et vérifiez la progression dans la zone d'information
+====
+
+<<<
+
+== Autres options
+
+=== Choix du mode de stockage
+
+Le mode de stockage (_base de données_ ou _système de fichiers_) des fichiers peut être défini via le menu menu *Fichier* / *Mode de stockage des fichiers*
+
+image::storage1.png[scaledwidth=75%, caption="Figure 17: ", title="Choix du mode de stockage"]
+
+=== Activation du mode Expert
+
+Un mode *EXPERT* permettant d'accéder à des options complémentaires peut être activé via le menu *Aide* / *Activer le mode Expert*.
+Un mode passe saisi via l'IHM ci-dessous permet d'aciver ce mode.
+
+image::expert1.png[scaledwidth=75%, caption="Figure 18: ", title="Activation du mode Expert"]
+
+[CAUTION]
+====
+Cette option - et donc son mode de passe d'activation - sont réservées à des interventions *_Digitech_*
+====
+
+[NOTE]
+====
+Cette option doit être réactivée à chaque démarrage de l'application
+====

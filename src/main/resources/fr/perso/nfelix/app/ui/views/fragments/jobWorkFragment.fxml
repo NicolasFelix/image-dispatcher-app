@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--progress content -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<StackPane fx:id="jobInProgressPane" visible="false" xmlns="http://javafx.com/javafx/8"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="fr.perso.nfelix.app.ui.controllers.fragments.JobWorkProgressFragment"
+           prefHeight="100" prefWidth="100">
+  <GridPane AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" vgap="10" maxHeight="Infinity" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+    <columnConstraints>
+      <ColumnConstraints hgrow="ALWAYS" minWidth="150.0" prefWidth="15.0" maxWidth="150.0"/>
+      <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+    <padding>
+      <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <Label styleClass="titleLabel" text="%job.progress.title" GridPane.rowIndex="0" GridPane.columnSpan="2"/>
+
+    <StackPane fx:id="jobActionPane" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2">
+      <HBox spacing="2">
+        <Button fx:id="cancelButton" mnemonicParsing="false" text="%button.stop.import"/>
+
+        <Text text="%label.progress.job"/>
+        <TextField fx:id="currentJobField" disable="true"/>
+
+        <ProgressBar fx:id="progressBar" minWidth="300"/>
+      </HBox>
+    </StackPane>
+
+    <TextArea fx:id="progressArea" editable="false" minHeight="200" GridPane.rowIndex="2" GridPane.columnSpan="2" GridPane.vgrow="ALWAYS"/>
+
+  </GridPane>
+</StackPane>
+

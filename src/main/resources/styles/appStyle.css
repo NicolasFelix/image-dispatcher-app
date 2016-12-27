@@ -1,0 +1,60 @@
+.root {
+    -fx-background-image: url("../images/logo_digitech.jpg");
+    -fx-background-position: right bottom;
+    -fx-background-repeat: no-repeat;
+    -fx-background-color: #FFFFFF;
+
+    -fx-control-inner-background: derive(-fx-base, 80%);
+    /* Version of -fx-control-inner-background for alternative rows */
+    -fx-control-inner-background-alt: derive(-fx-control-inner-background, -2%);
+}
+
+.button:hover {
+    -fx-text-fill: dodgerblue;
+}
+
+.separator {
+    -fx-background-color: dodgerblue;
+    -fx-background-radius: 2;
+}
+
+.text-field {
+    -fx-background-color: #0087a9, white;
+}
+
+.text-field:focused {
+    -fx-background-color: #3c53a9, white;
+}
+
+.text-field:disabled {
+    -fx-background-color: #ff6a00, white;
+    -fx-opacity: 1.0;
+}
+
+.text-input:disabled {
+    -fx-text-fill: #ff0903;
+    -fx-font-style: italic;
+    -fx-opacity: 1.0;
+}
+
+.txtarea .scroll-pane:disabled {
+    -fx-opacity: 1.0;
+}
+
+.masker-pane .masker-text {
+    -fx-text-alignment: center;
+}
+
+.chart-area-symbol {
+    visibility: hidden;
+}
+
+.default-color0.chart-series-area-line {
+    -fx-stroke: #2690ff;
+    -fx-stroke-width: 1px;
+    -fx-effect: null;
+}
+
+.default-color0.chart-series-area-fill {
+    -fx-fill: #8ef3ff33;
+}
