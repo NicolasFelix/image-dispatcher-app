@@ -44,8 +44,7 @@ public class SettingsController extends AbstractFxController {
       // add items to whole property list
       final ObservableList<PropertySheet.Item> items = propertyListItem.getItems();
       items.clear();
-      items.addAll(BeanPropertyToSheetItemConverter.getProperties(config.getDbConfig()));
-      items.addAll(BeanPropertyToSheetItemConverter.getProperties(config.getGlobalConfig()));
+      config.getSubConfigs().forEach((code, bean) -> items.addAll(BeanPropertyToSheetItemConverter.getProperties(bean)));
 
       try {
         savedConfig = SerializationUtils.clone(config);

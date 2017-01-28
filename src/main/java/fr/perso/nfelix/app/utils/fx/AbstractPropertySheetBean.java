@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author N.FELIX
  */
 @Slf4j
-@EqualsAndHashCode(doNotUseGetters = true, exclude = { "resources", "jobConfigParameterAllowed" })
+@EqualsAndHashCode(doNotUseGetters = true, exclude = { "jobConfigParameterAllowed" })
 public abstract class AbstractPropertySheetBean implements IPropertySheetBean, Cloneable, Serializable {
 
   @Setter(AccessLevel.PROTECTED)

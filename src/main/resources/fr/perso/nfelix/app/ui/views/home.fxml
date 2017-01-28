@@ -64,14 +64,9 @@
           <Insets top="10" right="10" left="10"/>
         </padding>
 
-        <HBox GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2" spacing="10">
-          <Label fx:id="databaseStatus" text="%label.database.status"/>
-          <Button fx:id="statusDatabaseBut"/>
-        </HBox>
-        <Separator GridPane.columnSpan="2" GridPane.rowIndex="1"/>
 
-        <Label styleClass="titleLabel" text="toto" GridPane.columnSpan="2" GridPane.rowIndex="5"/>
-        <HBox GridPane.columnSpan="2" GridPane.rowIndex="6" spacing="10">
+        <Label styleClass="titleLabel" text="%label.action.title" GridPane.columnSpan="2" GridPane.rowIndex="1"/>
+        <HBox GridPane.columnSpan="2" GridPane.rowIndex="2" spacing="10">
           <Button fx:id="runButton" text="%button.run.import" onAction="#runJobs"/>
         </HBox>
 

@@ -3,7 +3,7 @@ package fr.perso.nfelix.app.ui.config;
 import static fr.perso.nfelix.app.ui.typedef.Constants.*;
 
 import ch.qos.logback.classic.Level;
-import fr.perso.nfelix.app.ui.config.editor.ComboWithIconPropertyEditor.ComboWithIconStruc;
+import fr.perso.nfelix.app.ui.config.editor.ComboWithIconPropertyEditor.ComboWithIconStruct;
 import fr.perso.nfelix.app.utils.fx.AbstractPropertySheetBean;
 import java.util.HashSet;
 import java.util.ResourceBundle;
@@ -31,10 +31,10 @@ public class GlobalConfig extends AbstractPropertySheetBean {
   private final static String INFO_LEVEL  = "INFO";
   private final static String OFF_LEVEL   = "OFF";
 
-  private final static ComboWithIconStruc   LOG_DEBUG            = new ComboWithIconStruc(DEBUG_LEVEL, DEBUG_LEVEL, DEBUG_LOG_LEVEL_ICON);
-  private final static ComboWithIconStruc   LOG_INFO             = new ComboWithIconStruc(INFO_LEVEL, INFO_LEVEL, INFO_LOG_LEVEL_ICON);
-  private final static ComboWithIconStruc   LOG_OFF              = new ComboWithIconStruc(OFF_LEVEL, OFF_LEVEL, OFF_LOG_LEVEL_ICON);
-  final static         ComboWithIconStruc[] AVAILABLE_LOG_LEVELS = { LOG_DEBUG, LOG_INFO, LOG_OFF };
+  private final static ComboWithIconStruct   LOG_DEBUG            = new ComboWithIconStruct(DEBUG_LEVEL, DEBUG_LEVEL, DEBUG_LOG_LEVEL_ICON);
+  private final static ComboWithIconStruct   LOG_INFO             = new ComboWithIconStruct(INFO_LEVEL, INFO_LEVEL, INFO_LOG_LEVEL_ICON);
+  private final static ComboWithIconStruct   LOG_OFF              = new ComboWithIconStruct(OFF_LEVEL, OFF_LEVEL, OFF_LOG_LEVEL_ICON);
+  final static         ComboWithIconStruct[] AVAILABLE_LOG_LEVELS = { LOG_DEBUG, LOG_INFO, LOG_OFF };
 
   @Setter
   @Getter

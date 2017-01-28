@@ -59,11 +59,11 @@ public class DatabaseConfig extends AbstractPropertySheetBean {
       new String[] { ORACLE_SEARCH_WORD, ORACLE_DRIVER, ORACLE_DIALECT }, new String[] { POSTGRE_SEARCH_WORD, POSTGRE_DRIVER, POSTGRE_DIALECT },
       new String[] { MYSQL_SEARCH_WORD, MYSQL_DRIVER, MYSQL_DIALECT } };
 
-  private final static ComboWithIconPropertyEditor.ComboWithIconStruc ORACLE     = new ComboWithIconPropertyEditor.ComboWithIconStruc(ORACLE_DRIVER,
+  private final static ComboWithIconPropertyEditor.ComboWithIconStruct ORACLE     = new ComboWithIconPropertyEditor.ComboWithIconStruct(ORACLE_DRIVER,
       ORACLE_SEARCH_WORD, Constants.ORACLE_DB_ICON);
-  private final static ComboWithIconPropertyEditor.ComboWithIconStruc POSTGRESQL = new ComboWithIconPropertyEditor.ComboWithIconStruc(POSTGRE_DRIVER,
+  private final static ComboWithIconPropertyEditor.ComboWithIconStruct POSTGRESQL = new ComboWithIconPropertyEditor.ComboWithIconStruct(POSTGRE_DRIVER,
       POSTGRE_SEARCH_WORD, Constants.POSTGRE_DB_ICON);
-  private final static ComboWithIconPropertyEditor.ComboWithIconStruc MYSQL      = new ComboWithIconPropertyEditor.ComboWithIconStruc(MYSQL_DRIVER,
+  private final static ComboWithIconPropertyEditor.ComboWithIconStruct MYSQL      = new ComboWithIconPropertyEditor.ComboWithIconStruct(MYSQL_DRIVER,
       MYSQL_SEARCH_WORD, Constants.MYSQL_DB_ICON);
   // private final static ComboWithIconStruc[] AVAILABLE_JDBC_DRIVERS = { ORACLE, POSTGRESQL, MYSQL };
 

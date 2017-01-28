@@ -7,6 +7,7 @@ import fr.perso.nfelix.app.ui.typedef.JobConstants;
 import fr.perso.nfelix.app.ui.utils.FXViewManager;
 import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
 import fr.perso.nfelix.app.ui.utils.SpringContextHolder;
+import fr.perso.nfelix.app.utils.ApplicationHolder;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
@@ -109,6 +110,7 @@ public class ImgDispatcherUIApp extends Application {
       initMainUI(appStage);
 
       restoreWindowsPosition();
+      ApplicationHolder.getINSTANCE().setMainApp(this);
 
       appStage.show();
     }

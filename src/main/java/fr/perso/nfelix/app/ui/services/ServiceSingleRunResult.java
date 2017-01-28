@@ -32,8 +32,18 @@ public class ServiceSingleRunResult {
   @Setter
   private int stepFilter = 100;
 
+  public ServiceSingleRunResult() {
+    this(null);
+  }
+
+  public ServiceSingleRunResult(IUpdatableUI ui) {
+    super();
+    this.ui = ui;
+  }
+
   @Setter
   @Getter
+
   private long expectedNumber = -1L;
 
   public void reset() {
@@ -92,6 +102,10 @@ public class ServiceSingleRunResult {
             .format("{0} request(s) treated in {1} ms ({2} ms/req, last {3} : {4} ms/req)  // ({5} skipped, {6} error(s)) [Left items:{7}, time:''{8}'']",
                 currentValue, DurationFormatUtils.formatDuration(totalTimeMs, FORMAT_DURATION_HMS), totalTimeMs / currentValue, stepFilter,
                 stepTimeMs / stepFilter, getSkipped(), getFailed(), itemLeft, DurationFormatUtils.formatDuration(estimatedTimeLeftMs, FORMAT_DURATION_HMS)));
+
+        ui.onUpdateProgress((double) currentValue / Math.max(1.0, expectedNumber));
+        ui.onUpdateProgressMessage(currentValue + " / " + expectedNumber);
+
         stepStartDate = new Date();
       }
     }

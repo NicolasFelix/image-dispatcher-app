@@ -14,7 +14,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -38,8 +37,6 @@ public class JobWorkProgressFragment extends AbstractFxFragment {
   @FXML
   private TextArea    progressArea;
   @FXML
-  private TextField   currentJobField;
-  @FXML
   private ProgressBar progressBar;
 
   @FXML
@@ -53,11 +50,6 @@ public class JobWorkProgressFragment extends AbstractFxFragment {
       progressArea.appendText(msg);
       progressArea.appendText(LINE_SEP);
     });
-  }
-
-  @Override
-  public void onUpdateJobName(String jobName) {
-    Platform.runLater(() -> currentJobField.setText(jobName));
   }
 
   @Override
@@ -98,7 +90,6 @@ public class JobWorkProgressFragment extends AbstractFxFragment {
     super.clear();
     taskData.reset();
     progressArea.clear();
-    currentJobField.setText("...");
   }
 
   public void start() {
@@ -110,6 +101,10 @@ public class JobWorkProgressFragment extends AbstractFxFragment {
 
   public void setDisable(boolean disable) {
     jobInProgressPane.setDisable(disable);
+  }
+
+  public void setVisible(boolean visible) {
+    jobInProgressPane.setVisible(visible);
   }
 
   private void displayNotification(boolean failed, String msgSuffix) {

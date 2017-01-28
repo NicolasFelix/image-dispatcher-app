@@ -29,7 +29,7 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
 
   public final static String ITEMS_KEY = "items";
 
-  private List<ComboWithIconStruc> items = null;
+  private List<ComboWithIconStruct> items = null;
 
   public ComboWithIconPropertyEditor(PropertySheet.Item property) {
     this(property, new ComboBox());
@@ -46,7 +46,7 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
 
   private void initList(PropertySheet.Item property, ComboBox control) {
     if(property instanceof CustomBeanProperty) {
-      items = (List<ComboWithIconStruc>) ((CustomBeanProperty) property).getProperty(ITEMS_KEY);
+      items = (List<ComboWithIconStruct>) ((CustomBeanProperty) property).getProperty(ITEMS_KEY);
       if(items == null || items.size() <= 0) {
         LOGGER.error("property list is null/empy");
       }
@@ -80,7 +80,7 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
    */
   private static class ColorRectCell extends ListCell<String> {
 
-    private List<ComboWithIconStruc> availableItems = null;
+    private List<ComboWithIconStruct> availableItems = null;
 
     public ColorRectCell(ComboWithIconPropertyEditor editor) {
       super();
@@ -94,7 +94,7 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
       if(item != null && availableItems != null) {
         ImageView iv = null;
 
-        for(ComboWithIconStruc ai : availableItems) {
+        for(ComboWithIconStruct ai : availableItems) {
           if(item.contains(ai.searchWork)) {
             iv = new ImageView(new Image(ai.iconPath, 16, 16, true, true));
             break;
@@ -112,7 +112,7 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
   @Getter
   @Setter
   @AllArgsConstructor
-  public static class ComboWithIconStruc {
+  public static class ComboWithIconStruct {
     private String label;
     private String searchWork;
     private String iconPath;

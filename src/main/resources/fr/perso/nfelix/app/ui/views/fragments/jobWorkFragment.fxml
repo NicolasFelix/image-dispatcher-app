@@ -2,9 +2,11 @@
 
 <!--progress content -->
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
 <StackPane fx:id="jobInProgressPane" visible="false" xmlns="http://javafx.com/javafx/8"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="fr.perso.nfelix.app.ui.controllers.fragments.JobWorkProgressFragment"
@@ -23,9 +25,6 @@
     <StackPane fx:id="jobActionPane" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2">
       <HBox spacing="2">
         <Button fx:id="cancelButton" mnemonicParsing="false" text="%button.stop.import"/>
-
-        <Text text="%label.progress.job"/>
-        <TextField fx:id="currentJobField" disable="true"/>
 
         <ProgressBar fx:id="progressBar" minWidth="300"/>
       </HBox>

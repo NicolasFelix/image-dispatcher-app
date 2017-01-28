@@ -1,5 +1,6 @@
 package fr.perso.nfelix.app.ui.services;
 
+import fr.perso.nfelix.app.ui.controllers.IUpdatableUI;
 import lombok.Setter;
 
 /**
@@ -12,13 +13,13 @@ public abstract class AbstractThreadedService<V> extends CancellableService<V> {
   @Setter
   protected int threadCoefficient = 10;
   @Setter
-  protected int dumpStep          = 100;
+  protected int dumpStep          = 50;
 
-  public AbstractThreadedService() {
-    super();
+  public AbstractThreadedService(IUpdatableUI updatableUI) {
+    super(updatableUI);
   }
 
-  public AbstractThreadedService(TaskProgressData taskData) {
-    super(taskData);
+  public AbstractThreadedService(TaskProgressData taskData, IUpdatableUI updatableUI) {
+    super(taskData, updatableUI);
   }
 }

@@ -1,7 +1,7 @@
 package fr.perso.nfelix.app;
 
-import fr.perso.nfelix.app.ui.config.DatabaseConfig;
 import fr.perso.nfelix.app.ui.config.GlobalConfig;
+import fr.perso.nfelix.app.ui.config.ImportConfig;
 import fr.perso.nfelix.app.ui.typedef.JobConstants;
 import fr.perso.nfelix.app.utils.DFileUtils;
 import fr.perso.nfelix.app.utils.DIOUtils;
@@ -33,7 +33,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
  * @author N.FELIX
  */
 @Slf4j
-@EqualsAndHashCode(doNotUseGetters = true, exclude = { "dirty", "preventDirtyChanges", "mainResources" })
+@EqualsAndHashCode(doNotUseGetters = true, exclude = { "dirty", "preventDirtyChanges", })
 public class DispatcherConfig implements Cloneable, Serializable {
 
   private final static String INI_FILE_NAME        = "imgDispatcher.properties";
@@ -42,7 +42,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
   // used to inject property to Spring
   private static final String SYSTEM_CONFIG_FOLDER = "config.folder";
 
-  private final static String CITY2_SECTION  = "1 - database";
+  private final static String IMPORT_SECTION = "01 - Import";
   private final static String GLOBAL_SECTION = "99 - Autres";
 
   private final static String METHOD_GET_PREFIX = "get";
@@ -57,9 +57,10 @@ public class DispatcherConfig implements Cloneable, Serializable {
   private transient ResourceBundle mainResources;
 
   @Getter
-  private DatabaseConfig dbConfig;
+  private ImportConfig importConfig;
+
   @Getter
-  private GlobalConfig   globalConfig;
+  private GlobalConfig globalConfig;
 
   @Getter
   @Setter
@@ -78,7 +79,8 @@ public class DispatcherConfig implements Cloneable, Serializable {
   @Setter
   private boolean preventDirtyChanges = false;
 
-  private Map<String, AbstractPropertySheetBean> configs;
+  @Getter
+  private Map<String, AbstractPropertySheetBean> subConfigs;
 
   /**
    * Constructeur
@@ -115,12 +117,12 @@ public class DispatcherConfig implements Cloneable, Serializable {
   }
 
   private void clear() {
-    dbConfig = new DatabaseConfig(CITY2_SECTION, mainResources, false);
     globalConfig = new GlobalConfig(GLOBAL_SECTION, mainResources);
+    importConfig = new ImportConfig(IMPORT_SECTION, mainResources);
 
-    configs = new HashMap<>(7);
-    configs.put(CITY2_SECTION, dbConfig);
-    configs.put(GLOBAL_SECTION, globalConfig);
+    subConfigs = new HashMap<>(1);
+    subConfigs.put(GLOBAL_SECTION, globalConfig);
+    subConfigs.put(IMPORT_SECTION, importConfig);
   }
 
   /**
@@ -144,7 +146,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       LOGGER.error(e.getLocalizedMessage(), e);
     }
 
-    for(Map.Entry<String, AbstractPropertySheetBean> config : configs.entrySet()) {
+    for(Map.Entry<String, AbstractPropertySheetBean> config : subConfigs.entrySet()) {
       final SubnodeConfiguration section = iniFile.getSection(config.getKey());
       if(section != null) {
         initConfigFromSection(config.getValue(), section);
@@ -176,7 +178,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
     }
     INIConfiguration iniFile = new INIConfiguration();
 
-    for(AbstractPropertySheetBean config : configs.values()) {
+    for(AbstractPropertySheetBean config : subConfigs.values()) {
       addSectionFromConfig(iniFile, config);
     }
 
@@ -277,7 +279,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       throws IOException {
     Properties props = new Properties();
 
-    for(AbstractPropertySheetBean config : configs.values()) {
+    for(AbstractPropertySheetBean config : subConfigs.values()) {
       config.addJobConfigParameters(props);
     }
 
@@ -288,7 +290,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       props.store(fos, " Do not write to this file, it is automatically generated !!!");
     }
     catch(IOException e) {
-      LOGGER.error("error while saving '{}{}': '{}'", getDbConfig(), propertiesFileName, e.getLocalizedMessage());
+      LOGGER.error("error while saving '{}': '{}'", propertiesFileName, e.getLocalizedMessage());
       LOGGER.error(e.getLocalizedMessage(), e);
       throw e;
     }
