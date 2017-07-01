@@ -23,7 +23,6 @@ public class ServiceSingleRunResult {
   private AtomicLong succeeded = new AtomicLong();
   private AtomicLong skipped   = new AtomicLong();
 
-  @Getter
   private Date startDate     = new Date();
   private Date stepStartDate = new Date();
 
@@ -43,7 +42,6 @@ public class ServiceSingleRunResult {
 
   @Setter
   @Getter
-
   private long expectedNumber = -1L;
 
   public void reset() {
@@ -53,6 +51,10 @@ public class ServiceSingleRunResult {
     startDate = new Date();
     stepStartDate = new Date();
     expectedNumber = -1L;
+  }
+
+  public Date getStartDate() {
+    return startDate != null ? new Date(startDate.getTime()) : null;
   }
 
   public long incrementFailed() {
@@ -96,7 +98,7 @@ public class ServiceSingleRunResult {
         long totalTimeMs = (timeMillis - startDate.getTime());
         long stepTimeMs = (timeMillis - stepStartDate.getTime());
         long itemLeft = expectedNumber - currentValue;
-        long estimatedTimeLeftMs = ((currentValue > 0) ? ((itemLeft * totalTimeMs) / currentValue) : 0);
+        long estimatedTimeLeftMs = (itemLeft * totalTimeMs) / currentValue;
 
         ui.onUpdateText(MessageFormat
             .format("{0} request(s) treated in {1} ms ({2} ms/req, last {3} : {4} ms/req)  // ({5} skipped, {6} error(s)) [Left items:{7}, time:''{8}'']",

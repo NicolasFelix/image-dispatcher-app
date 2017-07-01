@@ -11,7 +11,7 @@ import lombok.Setter;
 public abstract class AbstractThreadedService<V> extends CancellableService<V> {
 
   @Setter
-  protected int threadCoefficient = 10;
+  private   int threadCoefficient = 10;
   @Setter
   protected int dumpStep          = 50;
 

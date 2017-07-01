@@ -1,0 +1,43 @@
+ -----
+ The Site
+ -----
+ The Maven Team
+ -----
+
+Stresser Maven Site 
+
+ Welcome to the maven site for the Stresser project.
+ 
+ This project aims to create easily and quickly some stress applications, 
+ 
+ i.e. an application able to intensively query another application.
+ 
+ <<example>> :
+ 
+   *  Perform some stress queries on the AIRS Server, through dossier-core or by using direct jcorbairs APIs.
+   
+   *  Perform some stress queries on the OpenOffice engine.
+   
+   *  Perform birt Engine stress capababilities.
+   
+   *  Perform multi-instance city-core queries.
+   []
+ 
+ 
+ This module does not aim to replace some professional tools (like jMeter, selenium, ...),
+ 
+ but as a Digitech tool, it can easily be customized, extended.
+ 
+  Please, use the left links to navigate through this site.
+  
+ <<ENJOY !!!>>
+ 
+ [Note:] 
+ 	The simpliest way to extend this application is to write some groovy files ;-).
+ 	
+  But for more complex operation, you may write your own jar file, hosting your business work.
+  
+ 
+
+ 
+ 

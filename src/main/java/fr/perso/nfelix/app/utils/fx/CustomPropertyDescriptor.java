@@ -2,6 +2,7 @@ package fr.perso.nfelix.app.utils.fx;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -72,7 +73,9 @@ public class CustomPropertyDescriptor extends PropertyDescriptor {
   /**
    * Order Property Comparator clazz
    */
-  public static class OrderedPropertyDescComparable implements Comparator<PropertyDescriptor> {
+  public static class OrderedPropertyDescComparable implements Comparator<PropertyDescriptor>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int compare(PropertyDescriptor o1, PropertyDescriptor o2) {
@@ -103,5 +106,15 @@ public class CustomPropertyDescriptor extends PropertyDescriptor {
       }
       return ret;
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj) && order == ((CustomPropertyDescriptor) obj).getOrder();
+  }
+
+  @Override
+  public int hashCode() {
+    return 37 * super.hashCode() + Integer.hashCode(order);
   }
 }

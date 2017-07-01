@@ -42,7 +42,7 @@ public class GlobalConfigBeanInfo extends AbstractBeanAware {
       pdLogLevel.setPropertyEditorClass(ComboWithIconPropertyEditor.class);
       pdLogLevel.addProperty(ITEMS_KEY, Arrays.asList(AVAILABLE_LOG_LEVELS));
       pds.add(pdLogLevel);
-      ++order;
+      // ++order;
 
       return pds.toArray(new PropertyDescriptor[pds.size()]);
     }

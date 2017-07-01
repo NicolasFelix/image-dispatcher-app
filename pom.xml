@@ -16,7 +16,7 @@
     <springframework.version>4.3.5.RELEASE</springframework.version>
     <spring.security.version>4.2.0.RELEASE</spring.security.version>
     <slf4j.version>1.7.22</slf4j.version>
-    <logback.version>1.1.8</logback.version>
+    <logback.version>1.2.1</logback.version>
     <janino.version>2.7.8</janino.version>
 
     <!-- maven compiler plugin is define into parent -->
@@ -24,6 +24,10 @@
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>dd/MM/yyyy-HH:mm:ss</maven.build.timestamp.format>
+    <maven.findbugs.plugin.version>3.0.1</maven.findbugs.plugin.version>
+    <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
+    <maven.reports.plugin.version>2.9</maven.reports.plugin.version>
+    <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
 
     <!--<kotlin.version>1.0.3</kotlin.version>-->
     <thymeleaf.version>3.0.2.RELEASE</thymeleaf.version>
@@ -39,9 +43,55 @@
 
     <!--<svnkit.version>1.8.14</svnkit.version>-->
     <metadata-extractor.version>2.9.1</metadata-extractor.version>
+
   </properties>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <!-- findbugs -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>${maven.findbugs.plugin.version}</version>
+        </plugin>
+
+        <!-- checkstyle -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${maven.checkstyle.plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>7.5.1</version>
+            </dependency>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>jcl-over-slf4j</artifactId>
+              <version>${slf4j.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <!-- report plugin-->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>${maven.reports.plugin.version}</version>
+        </plugin>
+
+        <!-- javadoc -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven.javadoc.plugin.version}</version>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -49,6 +99,20 @@
         <configuration>
           <skip>true</skip>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <configuration>
+          <findbugsXmlOutput>true</findbugsXmlOutput>
+          <xmlOutput>true</xmlOutput>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
 
       <!-- addkotlin compiler -->
@@ -138,6 +202,50 @@
     </resources>
   </build>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>src/main/resources/digitech_checkstyle.xml</configLocation>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>checkstyle</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>cim</report>
+              <report>issue-tracking</report>
+              <report>scm</report>
+              <report>plugin-management</report>
+              <report>summary</report>
+              <report>dependency-convergence</report>
+              <report>dependency-management</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+
   <dependencies>
 
     <dependency>
@@ -207,7 +315,7 @@
     <dependency>
       <groupId>com.drewnoakes</groupId>
       <artifactId>metadata-extractor</artifactId>
-      <version>2.9.1.1</version>
+      <version>${metadata-extractor.version}</version>
     </dependency>
 
     <!-- LOGGING -->

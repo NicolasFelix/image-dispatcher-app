@@ -1,6 +1,9 @@
 package fr.perso.nfelix.app.utils;
 
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,11 +16,11 @@ public abstract class DJavaUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DJavaUtils.class);
 
-  private final static String   MAVEN_ROOT_PATH       = "/META-INF/maven/";
-  private final static String   MAVEN_PROP_FILE       = "pom.properties";
-  private final static String   SEP                   = "/";
+  private final static String       MAVEN_ROOT_PATH       = "/META-INF/maven/";
+  private final static String       MAVEN_PROP_FILE       = "pom.properties";
+  private final static String       SEP                   = "/";
   /** The available maven snapshot tokens */
-  public final static  String[] MAVEN_SNAPSHOT_TOKENS = { "-SNAPSHOT", ".RC", "-RC" };
+  public final static  List<String> MAVEN_SNAPSHOT_TOKENS = Collections.unmodifiableList(Arrays.asList("-SNAPSHOT", ".RC", "-RC"));
 
   /**
    * get class implementation (Manifest declaration)

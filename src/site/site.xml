@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Stresser" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+  <bannerLeft>
+    <name>Stresser</name>
+    <src>images/logo-left.png</src>
+  </bannerLeft>
+  <!-- <publishDate format="dd/MM/YYYY" position="bottom" /> -->
+
+  <body>
+    <links>
+      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
+    </links>
+
+    <menu name="Stresser">
+      <item name="Configuration" href="stresser_setup.html" />
+      <item name="Graph and Statistics generation" href="stresser_graph.html" />
+      <item name="Groovy" href="stresser_groovy.html" />
+      <item name="FAQ" href="stresser_faq.html" />
+    </menu>
+
+    <menu name="Maven 2.0">
+      <item name="Format APT" href="format_APT.html"/>
+    </menu>
+
+    <menu ref="reports" />
+  </body>
+
+</project>

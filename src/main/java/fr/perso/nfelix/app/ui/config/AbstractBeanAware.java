@@ -56,7 +56,8 @@ public class AbstractBeanAware extends SimpleBeanInfo implements IBeanConfigAwar
     cpd.setDisplayName(keys[1]);
     cpd.setOrder(order);
     cpd.setVisiblePredicate(visiblePredicate);
-    ++order;
+
+    // do not forget to increment order from the caller
     return cpd;
   }
 }

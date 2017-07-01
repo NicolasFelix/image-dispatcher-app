@@ -2,18 +2,26 @@ package fr.perso.nfelix.app;
 
 import static fr.perso.nfelix.app.ui.typedef.Constants.*;
 
-import com.sun.javafx.application.LauncherImpl;
-import fr.perso.nfelix.app.ui.typedef.JobConstants;
-import fr.perso.nfelix.app.ui.utils.FXViewManager;
-import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
-import fr.perso.nfelix.app.ui.utils.SpringContextHolder;
-import fr.perso.nfelix.app.utils.ApplicationHolder;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+import com.sun.javafx.application.LauncherImpl;
+
+import fr.perso.nfelix.app.ui.typedef.JobConstants;
+import fr.perso.nfelix.app.ui.utils.FXViewManager;
+import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
+import fr.perso.nfelix.app.ui.utils.SpringContextHolder;
+import fr.perso.nfelix.app.utils.ApplicationHolder;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.scene.Node;
@@ -26,35 +34,42 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.cli.*;
 
+/**
+ * main application clazz.
+ */
 @Slf4j
 public class ImgDispatcherUIApp extends Application {
 
-  private static final int          PORT   = 43666;
+  private static final int PORT                   = 43666;
   @SuppressWarnings("FieldCanBeLocal")
-  private              ServerSocket socket = null;
+  private ServerSocket     socket                 = null;
 
-  private static boolean restoreWindowsPosition = true;
+  private static boolean   restoreWindowsPosition = true;
 
   @Getter
   @Setter
-  private Stage appStage = null;
+  private Stage            appStage               = null;
 
   @Getter
   private DispatcherConfig config;
 
   @Getter
-  private ResourceBundle mainResources;
+  private ResourceBundle   mainResources;
 
+  /**
+   * the fucking main.
+   *
+   * @param args args
+   */
   public static void main(String... args) {
     LOGGER.info("used classpath: '{}'", System.getProperty("java.class.path"));
 
     try {
       LOGGER.info(">>> launching application");
-      final String HIDE_SPLASH_OPT[] = { "h", "hideSplash", "hide splash screen" };
-      final String RESET_WINDOWS_POS_OPT[] = { "w", "resetWindow", "reset window position" };
-      final String EXPERT_MODE_OPT[] = { "e123456$_$", "expertMode123456$_$", "exportMode ON" };
+      final String[] HIDE_SPLASH_OPT = { "h", "hideSplash", "hide splash screen" };
+      final String[] RESET_WINDOWS_POS_OPT = { "w", "resetWindow", "reset window position" };
+      final String[] EXPERT_MODE_OPT = { "e123456$_$", "expertMode123456$_$", "exportMode ON" };
 
       Options options = new Options();
       Option hideOpt = new Option(HIDE_SPLASH_OPT[0], HIDE_SPLASH_OPT[1], false, HIDE_SPLASH_OPT[2]);
@@ -102,7 +117,7 @@ public class ImgDispatcherUIApp extends Application {
     mainResources = JavaFXUtils.loadResourceBundle(FXML_MAIN);
 
     try {
-      this.setAppStage(appStage);
+      setAppStage(appStage);
       SpringContextHolder.buildSpringContext(this);
       initConfig();
       SpringContextHolder.getInstance().refreshSpringContext(JobConstants.FAKE_PROFILE);
@@ -140,6 +155,9 @@ public class ImgDispatcherUIApp extends Application {
     appStage.setMaximized(pref.getBoolean(WINDOWS_MAXIMIZED, false));
   }
 
+  /**
+   * save Windows Position
+   */
   public void saveWindowsPosition() {
     final Preferences pref = Preferences.userRoot().node(APP_NAME);
 
@@ -175,14 +193,14 @@ public class ImgDispatcherUIApp extends Application {
     config.load();
   }
 
-  private void handleShortcut(KeyEvent e) {
-    Node n = appStage.getScene().getFocusOwner();
-    if(n != null && n instanceof Control) {
-      Control c = (Control) n;
-      if(c.getContextMenu() != null) {
-        c.getContextMenu().getItems().stream().filter(item -> item.getAccelerator() != null && item.getAccelerator().match(e)).forEach(item -> {
+  private void handleShortcut(KeyEvent ke) {
+    Node node = appStage.getScene().getFocusOwner();
+    if(node != null && node instanceof Control) {
+      Control ctrl = (Control) node;
+      if(ctrl.getContextMenu() != null) {
+        ctrl.getContextMenu().getItems().stream().filter(item -> item.getAccelerator() != null && item.getAccelerator().match(ke)).forEach(item -> {
           item.fire();
-          e.consume();
+          ke.consume();
         });
       }
     }
@@ -190,16 +208,15 @@ public class ImgDispatcherUIApp extends Application {
 
   private void checkIfApplicationIsAlreadyRunning() {
     try {
-      //Bind to localhost adapter with a zero connection queue
+      // Bind to localhost adapter with a zero connection queue
       socket = new ServerSocket(PORT, 0, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
     }
     catch(BindException e) {
       LOGGER.warn("Application is already running.");
 
-      final Alert dialog = JavaFXUtils
-          .createDialog(mainResources, Alert.AlertType.ERROR, "application.title", "application.already.running.header", "application.already.running.content");
+      final Alert dialog = JavaFXUtils.createDialog(mainResources, Alert.AlertType.ERROR, "application.title", "application.already.running.header",
+          "application.already.running.content");
       dialog.showAndWait();
-      System.exit(1);
     }
     catch(IOException ioe) {
       LOGGER.error("Unexpected error: '" + ioe.getLocalizedMessage() + "'", ioe);

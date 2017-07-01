@@ -36,6 +36,8 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 @EqualsAndHashCode(doNotUseGetters = true, exclude = { "dirty", "preventDirtyChanges", })
 public class DispatcherConfig implements Cloneable, Serializable {
 
+  private static final long serialVersionUID = 1L;
+
   private final static String INI_FILE_NAME        = "imgDispatcher.properties";
   private final static String CONFIG_FOLDER        = "config/";
   private final static String SAVE_CONFIG_FOLDER   = CONFIG_FOLDER + "saved/";
@@ -138,7 +140,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       return;
     }
 
-    try(FileReader reader = new FileReader(iniF)) {
+    try(FileInputStream fis = new FileInputStream(iniF); InputStreamReader reader = new InputStreamReader(fis, "UTF8")) {
       iniFile.read(reader);
     }
     catch(ConfigurationException | IOException e) {
