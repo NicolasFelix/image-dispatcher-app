@@ -52,7 +52,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
   private final static String METHOD_SET_PREFIX = "set";
 
   private final static String QUOTE              = "\"";
-  private final static String EQUAL              = "=";
+  private static final String EQUAL              = "=";
   private final static String COMMA              = ",";
   private final static String COMMA_SUBSTITUTION = "¤¤";
 
@@ -140,7 +140,8 @@ public class DispatcherConfig implements Cloneable, Serializable {
       return;
     }
 
-    try(FileInputStream fis = new FileInputStream(iniF); InputStreamReader reader = new InputStreamReader(fis, "UTF8")) {
+    try(FileInputStream fis = new FileInputStream(iniF);
+        InputStreamReader reader = new InputStreamReader(fis, "UTF8")) {
       iniFile.read(reader);
     }
     catch(ConfigurationException | IOException e) {
@@ -156,6 +157,12 @@ public class DispatcherConfig implements Cloneable, Serializable {
     }
   }
 
+  /**
+   * save configuration
+   *
+   * @throws ConfigurationException in case of...
+   * @throws IOException            in case of...
+   */
   public void save()
       throws ConfigurationException, IOException {
 
@@ -197,10 +204,11 @@ public class DispatcherConfig implements Cloneable, Serializable {
 
     final Iterator<String> keys = iniSection.getKeys();
     while(keys.hasNext()) {
-      String k = keys.next();
+      String key = keys.next();
 
-      Arrays.stream(config.getPropertyNames()).filter(propName -> StringUtils.equalsIgnoreCase(k, propName)).findFirst().ifPresent(
-          propName -> invokeSetMethod(config, propName, StringUtils.replace(StringUtils.removeEnd(iniSection.getString(k), QUOTE), COMMA_SUBSTITUTION, COMMA)));
+      Arrays.stream(config.getPropertyNames()).filter(propName -> StringUtils.equalsIgnoreCase(key, propName)).findFirst().ifPresent(
+          propName -> invokeSetMethod(config, propName,
+              StringUtils.replace(StringUtils.removeEnd(iniSection.getString(key), QUOTE), COMMA_SUBSTITUTION, COMMA)));
     }
 
     config.readAdditionalProperties(iniSection);

@@ -20,11 +20,13 @@ import org.apache.commons.lang3.StringUtils;
 @EqualsAndHashCode(doNotUseGetters = true, callSuper = true)
 public class ImportConfig extends AbstractPropertySheetBean {
 
-  public final static String[] IMPORTFOLDER_KEY = { "importFolder", "Répertoire contenant les images à intégrer/scanner" };
-  public final static String[] SCANFOLDER_KEY   = { "scanFolder", "Répertoire de sortie" };
+  public static final String[] IMPORTFOLDER_KEY    = { "importFolder", "Répertoire contenant les images à intégrer/scanner" };
+  public static final String[] SCANFOLDER_KEY      = { "scanFolder", "Répertoire de sortie" };
+  public static final String[] DUPLICATEFOLDER_KEY = { "duplicateFolder", "Répertoire de sortie des images trouvées en doublon" };
 
   private String importFolder;
   private String scanFolder;
+  private String duplicateFolder;
 
   public ImportConfig(String category, ResourceBundle resources) {
     super(category, resources);
@@ -41,7 +43,7 @@ public class ImportConfig extends AbstractPropertySheetBean {
 
   @Override
   public String[] getPropertyNames() {
-    return new String[] { IMPORTFOLDER_KEY[0], SCANFOLDER_KEY[0] };
+    return new String[] { IMPORTFOLDER_KEY[0], SCANFOLDER_KEY[0], DUPLICATEFOLDER_KEY[0] };
   }
 
   @Override

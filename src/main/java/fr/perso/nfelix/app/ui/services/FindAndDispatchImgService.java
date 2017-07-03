@@ -90,8 +90,8 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
           final DispatcherConfig config = ApplicationHolder.getINSTANCE().getConfig();
           final ImportConfig importConfig = config.getImportConfig();
           String inPath = importConfig.getImportFolder();
-          // String outPath = "D:\\zDownload\\zzImages\\";
           String outPath = importConfig.getScanFolder();
+          String duplicatePath = importConfig.getDuplicateFolder();
           final Path sourceDir = Paths.get(inPath);
           final Path targetDir = Paths.get(outPath);
 
@@ -119,6 +119,10 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
               LOGGER.info(">>> starting group '{}' ({} items)", day, imgs.size());
 
               Path subOut = Paths.get(outPath, YEAR_FORMATTER.format(day), MONTH_FORMATTER.format(day), DAY_FORMATTER.format(day));
+              Path duplicateOut = null;
+              if(StringUtils.isNotBlank(duplicatePath)) {
+                duplicateOut = Paths.get(duplicatePath, YEAR_FORMATTER.format(day), MONTH_FORMATTER.format(day), DAY_FORMATTER.format(day));
+              }
               try {
                 Files.createDirectories(subOut);
 
@@ -129,7 +133,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
 
                   if(Files.exists(destination)) {
                     try {
-                      destination = getFinalPath(subOut, img);
+                      destination = getFinalPath(subOut, img, duplicateOut);
                       if(destination == null) {
                         ssrr.incrementSkipped();
                         continue;
@@ -190,11 +194,18 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
 
   private LocalDate getFileOriginalDateTime(String fPath)
       throws ImageProcessingException, IOException {
-    Metadata metadata = ImageMetadataReader.readMetadata(new File(fPath));
-    ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+    Metadata metadata = null;
+    try {
+      metadata = ImageMetadataReader.readMetadata(new File(fPath));
+    }
+    catch(ImageProcessingException ipe) {
+      LOGGER.warn("error while getting '" + fPath + "' metadata. " + ipe.getLocalizedMessage(), ipe);
+      return getFileSystemDateTime(fPath);
+    }
+    ExifSubIFDDirectory directory = (metadata != null) ? metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class) : null;
     if(directory == null) {
-      LOGGER.warn("no directory found for file '{}'", fPath);
-      return null;
+      LOGGER.warn("no EXIF directory found for file '{}'", fPath);
+      return getFileSystemDateTime(fPath);
     }
 
     // query the tag's value
@@ -205,6 +216,19 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     }
     final String dayString = dateOri.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(FULL_DAY_FORMATTER);
     return LocalDate.parse(dayString, FULL_DAY_FORMATTER);
+  }
+
+  private LocalDate getFileSystemDateTime(String fPath) {
+
+    try {
+      final BasicFileAttributes bfAtt = Files.readAttributes(Paths.get(fPath), BasicFileAttributes.class);
+      final FileTime fileTime = bfAtt.creationTime();
+      return LocalDate.parse(FULL_DAY_FORMATTER.withLocale(Locale.FRENCH).withZone(ZoneId.systemDefault()).format(fileTime.toInstant()));
+    }
+    catch(Throwable ioe) {
+      LOGGER.error("error while getting File attribut: " + ioe.getLocalizedMessage(), ioe);
+    }
+    return null;
   }
 
   private Map<LocalDate, List<String>> getFileList(final Path sourceDir)
@@ -220,7 +244,8 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
         final String fPath = file.toString();
 
         FileType fType;
-        try(FileInputStream fis = new FileInputStream(fPath); BufferedInputStream bis = new BufferedInputStream(fis)) {
+        try(FileInputStream fis = new FileInputStream(fPath);
+            BufferedInputStream bis = new BufferedInputStream(fis)) {
           fType = FileTypeDetector.detectFileType(bis);
         }
         catch(IOException ioe) {
@@ -260,7 +285,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
           if(subFiles == null) {
             subFiles = new ArrayList<>();
             files.put(dayImg, subFiles);
-            LOGGER.info("no group added ('{}')", dayImg);
+            LOGGER.info("new group added ('{}')", dayImg);
             if(updatableUI != null) {
               updatableUI.onUpdateText("new list created, for day '" + dayImg + "'");
             }
@@ -284,11 +309,12 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
   /**
    * get final path, if image is different from existing one
    *
-   * @param subOut folder
-   * @param img    image name
+   * @param subOut       folder
+   * @param img          image name
+   * @param duplicateOut
    * @return final image path, or null if image is already present...
    */
-  private Path getFinalPath(Path subOut, String img)
+  private Path getFinalPath(Path subOut, String img, Path duplicateOut)
       throws ImageProcessingException, IOException {
 
     Path destination = Paths.get(subOut.toString(), FilenameUtils.getName(img));
@@ -300,6 +326,19 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
       final LocalDate sourceDateTime = getFileOriginalDateTime(img);
       final LocalDate destinaltionDateTime = getFileOriginalDateTime(img);
       if(sourceDateTime != null && destinaltionDateTime != null && sourceDateTime.equals(destinaltionDateTime)) {
+
+        if(duplicateOut != null) {
+          Files.createDirectories(duplicateOut);
+          destination = Paths.get(duplicateOut.toString(), FilenameUtils.getName(img));
+          try {
+            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+          }
+          catch(IOException ioe) {
+            LOGGER.warn("error while copying file '" + source + "' to '" + destination + "': " + ioe.getLocalizedMessage(), ioe);
+          }
+          // copy it to external folder...
+          return null;
+        }
         LOGGER.info("file '{}' and '{}' hold same orgin dates", source, destination);
         return null;
       }

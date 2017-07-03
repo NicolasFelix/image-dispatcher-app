@@ -207,6 +207,10 @@ public abstract class AbstractPropertySheetBean implements IPropertySheetBean, C
       String initFolder = (String) beanProp.getPropertyDescriptor().getReadMethod().invoke(beanProp.getBean());
       if(StringUtils.isNotBlank(initFolder)) {
         File ret = new File(initFolder);
+        if(!ret.exists()) {
+          // mmh, folder not mounted ?
+          return null;
+        }
         if(!ret.isDirectory()) {
           ret = ret.getParentFile();
         }

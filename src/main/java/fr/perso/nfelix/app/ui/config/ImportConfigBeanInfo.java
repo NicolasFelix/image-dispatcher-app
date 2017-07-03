@@ -1,8 +1,10 @@
 package fr.perso.nfelix.app.ui.config;
 
+import static fr.perso.nfelix.app.ui.config.ImportConfig.DUPLICATEFOLDER_KEY;
 import static fr.perso.nfelix.app.ui.config.ImportConfig.IMPORTFOLDER_KEY;
 import static fr.perso.nfelix.app.ui.config.ImportConfig.SCANFOLDER_KEY;
 
+import fr.perso.nfelix.app.DispatcherConfig;
 import fr.perso.nfelix.app.ui.config.editor.ActionButtonPropertyEditor;
 import fr.perso.nfelix.app.ui.config.editor.FolderNavigationPropertyEditor;
 import fr.perso.nfelix.app.utils.fx.CustomPropertyDescriptor;
@@ -36,17 +38,25 @@ public class ImportConfigBeanInfo extends AbstractBeanAware {
       List<PropertyDescriptor> pds = new ArrayList<>(16);
 
       // zipFolder
-      final CustomPropertyDescriptor pdZip = (CustomPropertyDescriptor) buildPropertyDescriptor(IMPORTFOLDER_KEY, order);
-      pdZip.setPropertyEditorClass(FolderNavigationPropertyEditor.class);
-      pdZip.addProperty(ActionButtonPropertyEditor.EVENT_HANDLER_KEY, "chooseFolder");
-      pds.add(pdZip);
+      final CustomPropertyDescriptor pdImport = (CustomPropertyDescriptor) buildPropertyDescriptor(IMPORTFOLDER_KEY, order);
+      pdImport.setPropertyEditorClass(FolderNavigationPropertyEditor.class);
+      pdImport.addProperty(ActionButtonPropertyEditor.EVENT_HANDLER_KEY, "chooseFolder");
+      pds.add(pdImport);
       ++order;
       // inputFolder
-      final CustomPropertyDescriptor pdInput = (CustomPropertyDescriptor) buildPropertyDescriptor(SCANFOLDER_KEY, order);
-      pdInput.setPropertyEditorClass(FolderNavigationPropertyEditor.class);
-      pdInput.addProperty(ActionButtonPropertyEditor.EVENT_HANDLER_KEY, "chooseFolder");
-      pds.add(pdInput);
+      final CustomPropertyDescriptor pdScan = (CustomPropertyDescriptor) buildPropertyDescriptor(SCANFOLDER_KEY, order);
+      pdScan.setPropertyEditorClass(FolderNavigationPropertyEditor.class);
+      pdScan.addProperty(ActionButtonPropertyEditor.EVENT_HANDLER_KEY, "chooseFolder");
+      pds.add(pdScan);
       ++order;
+
+      // inputFolder
+      final CustomPropertyDescriptor pdDuplicate = (CustomPropertyDescriptor) buildPropertyDescriptor(DUPLICATEFOLDER_KEY, order);
+      pdDuplicate.setPropertyEditorClass(FolderNavigationPropertyEditor.class);
+      pdDuplicate.addProperty(ActionButtonPropertyEditor.EVENT_HANDLER_KEY, "chooseFolder");
+      pdDuplicate.setVisiblePredicate(customPropertyDescriptor -> DispatcherConfig.isExpertMode());
+      pds.add(pdDuplicate);
+      // ++order;
 
       return pds.toArray(new PropertyDescriptor[pds.size()]);
     }
