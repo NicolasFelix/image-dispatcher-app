@@ -1,8 +1,8 @@
 .root {
-    -fx-background-image: url("../images/logo_digitech.jpg");
+    -fx-background-image: url("../images/logo-vague-light.png");
     -fx-background-position: right bottom;
     -fx-background-repeat: no-repeat;
-    -fx-background-color: #FFFFFF;
+    /*-fx-background-color: #FFFFFF;*/
 
     -fx-control-inner-background: derive(-fx-base, 80%);
     /* Version of -fx-control-inner-background for alternative rows */
