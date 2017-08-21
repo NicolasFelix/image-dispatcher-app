@@ -1,5 +1,7 @@
 package fr.perso.nfelix.app;
 
+import static fr.perso.nfelix.app.ui.typedef.Constants.SAVE_PATTERN_DATE;
+
 import fr.perso.nfelix.app.ui.config.GlobalConfig;
 import fr.perso.nfelix.app.ui.config.ImportConfig;
 import fr.perso.nfelix.app.ui.typedef.JobConstants;
@@ -7,10 +9,10 @@ import fr.perso.nfelix.app.utils.DFileUtils;
 import fr.perso.nfelix.app.utils.DIOUtils;
 import fr.perso.nfelix.app.utils.DSystemUtils;
 import fr.perso.nfelix.app.utils.fx.AbstractPropertySheetBean;
-import fr.perso.nfelix.app.utils.sgbd.DalConstants;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -38,23 +40,23 @@ public class DispatcherConfig implements Cloneable, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final static String INI_FILE_NAME        = "imgDispatcher.properties";
-  private final static String CONFIG_FOLDER        = "config/";
-  private final static String SAVE_CONFIG_FOLDER   = CONFIG_FOLDER + "saved/";
+  private static final String INI_FILE_NAME        = "imgDispatcher.properties";
+  private static final String CONFIG_FOLDER        = "config/";
+  private static final String SAVE_CONFIG_FOLDER   = CONFIG_FOLDER + "saved/";
   // used to inject property to Spring
   private static final String SYSTEM_CONFIG_FOLDER = "config.folder";
 
-  private final static String IMPORT_SECTION = "01 - Import";
-  private final static String GLOBAL_SECTION = "99 - Autres";
+  private static final String IMPORT_SECTION = "01 - Import";
+  private static final String GLOBAL_SECTION = "99 - Autres";
 
-  private final static String METHOD_GET_PREFIX = "get";
-  private final static String METHOD_IS_PREFIX  = "is";
-  private final static String METHOD_SET_PREFIX = "set";
+  private static final String METHOD_GET_PREFIX = "get";
+  private static final String METHOD_IS_PREFIX  = "is";
+  private static final String METHOD_SET_PREFIX = "set";
 
-  private final static String QUOTE              = "\"";
+  private static final String QUOTE              = "\"";
   private static final String EQUAL              = "=";
-  private final static String COMMA              = ",";
-  private final static String COMMA_SUBSTITUTION = "¤¤";
+  private static final String COMMA              = ",";
+  private static final String COMMA_SUBSTITUTION = "¤¤";
 
   private transient ResourceBundle mainResources;
 
@@ -95,13 +97,14 @@ public class DispatcherConfig implements Cloneable, Serializable {
     this.mainResources = mainResources;
 
     try {
-      executionPath = FilenameUtils.normalizeNoEndSeparator(executionPath);
-      if(StringUtils.isBlank(executionPath)) {
-        executionPath = FilenameUtils
+      String path = FilenameUtils.normalizeNoEndSeparator(executionPath);
+      if(StringUtils.isBlank(path)) {
+        path = FilenameUtils
             .normalizeNoEndSeparator(new File(DispatcherConfig.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent());
       }
 
-      executionPath += File.separatorChar;
+      path += File.separatorChar;
+      setExecutionPath(path);
       try {
         FileUtils.forceMkdir(new File(getConfigFolder()));
       }
@@ -122,7 +125,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
     globalConfig = new GlobalConfig(GLOBAL_SECTION, mainResources);
     importConfig = new ImportConfig(IMPORT_SECTION, mainResources);
 
-    subConfigs = new HashMap<>(1);
+    subConfigs = new HashMap<>(2);
     subConfigs.put(GLOBAL_SECTION, globalConfig);
     subConfigs.put(IMPORT_SECTION, importConfig);
   }
@@ -172,7 +175,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
 
       // make a save, if not existing yet
       final File savedFolder = new File(executionPath + SAVE_CONFIG_FOLDER);
-      String formatteToday = LocalDateTime.now().format(DateTimeFormatter.ofPattern(DalConstants.SAVE_PATTERN_DATE));
+      String formatteToday = LocalDateTime.now().format(DateTimeFormatter.ofPattern(SAVE_PATTERN_DATE));
 
       File savedIniFile = new File(savedFolder, formatteToday + "_" + INI_FILE_NAME);
       if(!savedIniFile.exists()) {
@@ -191,8 +194,9 @@ public class DispatcherConfig implements Cloneable, Serializable {
       addSectionFromConfig(iniFile, config);
     }
 
-    try(FileWriter writer = new FileWriter(iniFileName)) {
-      iniFile.write(writer);
+    try(FileOutputStream fos = new FileOutputStream(iniFileName);
+        Writer fStream = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+      iniFile.write(fStream);
     }
     finally {
       dirty = false;
@@ -315,5 +319,9 @@ public class DispatcherConfig implements Cloneable, Serializable {
       LOGGER.error("ExchangeConfig clone failed: " + e.getLocalizedMessage(), e);
     }
     return null;
+  }
+
+  private static void setExecutionPath(String path) {
+    DispatcherConfig.executionPath = path;
   }
 }

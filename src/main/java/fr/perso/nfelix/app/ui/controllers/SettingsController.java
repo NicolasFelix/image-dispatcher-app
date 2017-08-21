@@ -87,7 +87,7 @@ public class SettingsController extends AbstractFxController {
         }
 
         config.save();
-        config.getGlobalConfig().resetLogLevel();
+        config.getGlobalConfig().applyGlobalChanges();
       }
       catch(IOException | ConfigurationException e) {
         Alert dialog = JavaFXUtils

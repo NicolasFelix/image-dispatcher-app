@@ -1,7 +1,6 @@
 package fr.perso.nfelix.app.ui.config;
 
-import static fr.perso.nfelix.app.ui.config.GlobalConfig.AVAILABLE_LOG_LEVELS;
-import static fr.perso.nfelix.app.ui.config.GlobalConfig.LOGLEVEL_KEY;
+import static fr.perso.nfelix.app.ui.config.GlobalConfig.*;
 import static fr.perso.nfelix.app.ui.config.editor.ComboWithIconPropertyEditor.ITEMS_KEY;
 
 import fr.perso.nfelix.app.ui.config.editor.ComboWithIconPropertyEditor;
@@ -35,14 +34,22 @@ public class GlobalConfigBeanInfo extends AbstractBeanAware {
     try {
       // output format
       int order = 1;
-      List<PropertyDescriptor> pds = new ArrayList<>(1);
+      List<PropertyDescriptor> pds = new ArrayList<>(3);
 
       // log level
       CustomPropertyDescriptor pdLogLevel = (CustomPropertyDescriptor) buildPropertyDescriptor(LOGLEVEL_KEY, order);
       pdLogLevel.setPropertyEditorClass(ComboWithIconPropertyEditor.class);
       pdLogLevel.addProperty(ITEMS_KEY, Arrays.asList(AVAILABLE_LOG_LEVELS));
       pds.add(pdLogLevel);
-      // ++order;
+      ++order;
+      // theme
+      CustomPropertyDescriptor pdTheme = (CustomPropertyDescriptor) buildPropertyDescriptor(THEME_KEY, order);
+      pdTheme.setPropertyEditorClass(ComboWithIconPropertyEditor.class);
+      pdTheme.addProperty(ITEMS_KEY, Arrays.asList(AVAILABLE_THEMES));
+      pds.add(pdTheme);
+      ++order;
+
+      pds.add(buildPropertyDescriptor(DUMPSTEP_KEY, order));
 
       return pds.toArray(new PropertyDescriptor[pds.size()]);
     }

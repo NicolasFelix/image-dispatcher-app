@@ -2,26 +2,21 @@ package fr.perso.nfelix.app;
 
 import static fr.perso.nfelix.app.ui.typedef.Constants.*;
 
+import com.sun.javafx.application.LauncherImpl;
+import fr.perso.nfelix.app.ui.config.GlobalConfig;
+import fr.perso.nfelix.app.ui.typedef.JobConstants;
+import fr.perso.nfelix.app.ui.utils.FXViewManager;
+import fr.perso.nfelix.app.ui.utils.IRootController;
+import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
+import fr.perso.nfelix.app.ui.utils.SpringContextHolder;
+import fr.perso.nfelix.app.utils.ApplicationHolder;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-
-import com.sun.javafx.application.LauncherImpl;
-
-import fr.perso.nfelix.app.ui.typedef.JobConstants;
-import fr.perso.nfelix.app.ui.utils.FXViewManager;
-import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
-import fr.perso.nfelix.app.ui.utils.SpringContextHolder;
-import fr.perso.nfelix.app.utils.ApplicationHolder;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.scene.Node;
@@ -34,6 +29,7 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.cli.*;
 
 /**
  * main application clazz.
@@ -41,21 +37,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ImgDispatcherUIApp extends Application {
 
-  private static final int PORT                   = 43666;
+  private static final int          PORT   = 43666;
   @SuppressWarnings("FieldCanBeLocal")
-  private ServerSocket     socket                 = null;
+  private              ServerSocket socket = null;
 
-  private static boolean   restoreWindowsPosition = true;
+  private static boolean restoreWindowsPosition = true;
+
+  @Getter
+  private URL mainCss = null;
 
   @Getter
   @Setter
-  private Stage            appStage               = null;
+  private Stage appStage = null;
 
   @Getter
   private DispatcherConfig config;
 
   @Getter
-  private ResourceBundle   mainResources;
+  private ResourceBundle mainResources;
+
+  @Getter
+  private IRootController mainController;
 
   /**
    * the fucking main.
@@ -119,13 +121,13 @@ public class ImgDispatcherUIApp extends Application {
     try {
       setAppStage(appStage);
       SpringContextHolder.buildSpringContext(this);
+
+      ApplicationHolder.getINSTANCE().setMainApp(this);
+      initMainUI(appStage);
       initConfig();
       SpringContextHolder.getInstance().refreshSpringContext(JobConstants.FAKE_PROFILE);
 
-      initMainUI(appStage);
-
       restoreWindowsPosition();
-      ApplicationHolder.getINSTANCE().setMainApp(this);
 
       appStage.show();
     }
@@ -177,8 +179,9 @@ public class ImgDispatcherUIApp extends Application {
     // prevent main application to be closed using X icon
     stage.setOnCloseRequest(Event::consume);
 
-    FXViewManager mainController = new FXViewManager(this);
-    final Scene mainScene = mainController.loadMainScene(stage);
+    switchStyle(MAIN_STYLE + GlobalConfig.LIGHT_THEME + CSS_EXTENSION);
+    mainController = new FXViewManager(this);
+    final Scene mainScene = ((FXViewManager) mainController).loadMainScene(stage);
     mainScene.addEventFilter(KeyEvent.KEY_PRESSED, this::handleShortcut);
     stage.setScene(mainScene);
     mainController.switchToView(FXML_HOME);
@@ -214,13 +217,21 @@ public class ImgDispatcherUIApp extends Application {
     catch(BindException e) {
       LOGGER.warn("Application is already running.");
 
-      final Alert dialog = JavaFXUtils.createDialog(mainResources, Alert.AlertType.ERROR, "application.title", "application.already.running.header",
-          "application.already.running.content");
+      final Alert dialog = JavaFXUtils
+          .createDialog(mainResources, Alert.AlertType.ERROR, "application.title", "application.already.running.header", "application.already.running.content");
       dialog.showAndWait();
     }
     catch(IOException ioe) {
       LOGGER.error("Unexpected error: '" + ioe.getLocalizedMessage() + "'", ioe);
-      System.exit(2);
     }
+  }
+
+  /**
+   * reset main css
+   *
+   * @param css css file
+   */
+  public void switchStyle(final String css) {
+    mainCss = ImgDispatcherUIApp.class.getResource(css);
   }
 }

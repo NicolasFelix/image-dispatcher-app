@@ -7,8 +7,8 @@ import static fr.perso.nfelix.app.ui.utils.JavaFXUtils.loadResourceBundle;
 import fr.perso.nfelix.app.ImgDispatcherUIApp;
 import fr.perso.nfelix.app.ui.controllers.IFxController;
 import fr.perso.nfelix.app.ui.controllers.MainContainer;
+import fr.perso.nfelix.app.utils.ApplicationHolder;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import javafx.animation.KeyFrame;
@@ -42,8 +42,6 @@ public class FXViewManager extends StackPane implements IRootController {
 
   private HashMap<String, ViewCacheItem> screens = new HashMap<>();
 
-  private URL mainCss = null;
-
   @Getter
   private ImgDispatcherUIApp mainApp = null;
 
@@ -61,11 +59,6 @@ public class FXViewManager extends StackPane implements IRootController {
   public FXViewManager(ImgDispatcherUIApp app) {
     super();
     mainApp = app;
-    initAttributs();
-  }
-
-  private void initAttributs() {
-    mainCss = ImgDispatcherUIApp.class.getResource(MAIN_STYLE);
   }
 
   public void switchToView(final String fxmlKey)
@@ -143,8 +136,8 @@ public class FXViewManager extends StackPane implements IRootController {
       final ObservableList<String> stylesheets = mainApp.getAppStage().getScene().getStylesheets();
       stylesheets.clear();
       stylesheets.add(STYLES_ROOT + fxmlKey + CSS_EXTENSION);
-      if(mainCss != null) {
-        stylesheets.add(mainCss.toExternalForm());
+      if(ApplicationHolder.getINSTANCE().getMainApp().getMainCss() != null) {
+        stylesheets.add(ApplicationHolder.getINSTANCE().getMainApp().getMainCss().toExternalForm());
       }
 
       // new fade event ^^

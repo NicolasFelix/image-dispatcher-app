@@ -1,6 +1,10 @@
 package fr.perso.nfelix.app.ui.utils;
 
+import static fr.perso.nfelix.app.ui.typedef.Constants.CSS_EXTENSION;
+import static fr.perso.nfelix.app.ui.typedef.Constants.STYLES_ROOT;
+
 import fr.perso.nfelix.app.ui.typedef.Constants;
+import fr.perso.nfelix.app.utils.ApplicationHolder;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +13,7 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -99,10 +104,18 @@ public abstract class JavaFXUtils {
   }
 
   private static void buildDialog(Dialog dlg, String titleMsg, String headerMsg, String contentMsg, Throwable th) {
+
+
     if(StringUtils.isNotBlank(titleMsg)) {
       dlg.setTitle(titleMsg);
     }
     final DialogPane dialogPane = dlg.getDialogPane();
+    if(ApplicationHolder.getINSTANCE().getMainApp().getMainCss() != null) {
+      final ObservableList<String> stylesheets = dialogPane.getScene().getStylesheets();
+      stylesheets.clear();
+      stylesheets.add(ApplicationHolder.getINSTANCE().getMainApp().getMainCss().toExternalForm());
+    }
+
     if(StringUtils.isNotBlank(headerMsg)) {
       dialogPane.setHeaderText(headerMsg);
     }

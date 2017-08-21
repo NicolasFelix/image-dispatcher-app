@@ -6,7 +6,6 @@ import static fr.perso.nfelix.app.ui.utils.JavaFXUtils.createPasswordDialog;
 
 import fr.perso.nfelix.app.DispatcherConfig;
 import fr.perso.nfelix.app.ImgDispatcherUIAppPreloader;
-import fr.perso.nfelix.app.ui.config.DatabaseConfig;
 import fr.perso.nfelix.app.ui.controllers.fragments.JobWorkProgressFragment;
 import fr.perso.nfelix.app.ui.services.CancellableService;
 import fr.perso.nfelix.app.ui.services.FindAndDispatchImgService;
@@ -107,32 +106,6 @@ public class HomeController extends AbstractFxController {
     }
   }
 
-  private String getTooltipText(DatabaseConfig.DBStatus dbStatus) {
-    switch( dbStatus ) {
-    case OK:
-      return resources.getString("database.status.ok");
-    case KO:
-      return resources.getString("database.status.ko");
-
-    default:
-    case INVALID:
-      return resources.getString("database.status.invalid");
-    }
-  }
-
-  private String getIcon(DatabaseConfig.DBStatus dbStatus) {
-
-    switch( dbStatus ) {
-    case OK:
-      return STATUS_OK_ICON;
-    case KO:
-      return STATUS_KO_ICON;
-
-    default:
-    case INVALID:
-      return STATUS_WARN_ICON;
-    }
-  }
 
   public void quitApp(ActionEvent actionEvent) {
     quitApp();

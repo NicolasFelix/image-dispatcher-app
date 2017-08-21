@@ -86,8 +86,8 @@ public abstract class AbstractFxController extends Parent implements IFxControll
     try {
       rootController.switchToView(fxmlKey);
     }
-    catch(Exception e1) {
-      getLogger().error(e1.getLocalizedMessage(), e1);
+    catch(Exception e) {
+      getLogger().error(e.getLocalizedMessage(), e);
     }
     finally {
       getLogger().debug("<<< switchToView");
@@ -262,7 +262,6 @@ public abstract class AbstractFxController extends Parent implements IFxControll
    */
   public void showAboutBox(ActionEvent ae) {
 
-    Alert dlg = createDialog(resources, Alert.AlertType.INFORMATION, "about.title", null, "about.content");
 
     // application version and build number
     String mavenAppVersion = null;
@@ -283,6 +282,7 @@ public abstract class AbstractFxController extends Parent implements IFxControll
     mavenAppVersion = checkValue(mavenAppVersion, "ExchangeApp version");
     mavenAppBuildNumber = checkValue(mavenAppBuildNumber, "ExchangeApp build number");
 
+    Alert dlg = createDialog(resources, Alert.AlertType.INFORMATION, "about.title", null, "about.content");
     dlg.getDialogPane().setHeaderText(getSafeResourceValue("about.header", mavenAppVersion, mavenAppBuildNumber));
     dlg.showAndWait();
   }

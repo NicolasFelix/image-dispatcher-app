@@ -7,6 +7,7 @@ import fr.perso.nfelix.app.utils.DSystemUtils;
  *
  * @author N.FELIX
  */
+@SuppressWarnings("all")
 public abstract class Constants {
 
   public final static String APP_NAME       = "ImgDispatcherApp";
@@ -70,6 +71,10 @@ public abstract class Constants {
   public final static String INFO_LOG_LEVEL_ICON  = "/images/log/info.png";
   public final static String OFF_LOG_LEVEL_ICON   = "/images/log/off.png";
 
+  // theme
+  public final static String DARK_THEME_ICON  = "/images/theme/dark.png";
+  public final static String LIGHT_THEME_ICON = "/images/theme/light.png";
+
   public final static String TEST_ICON = "/images/menu/tools-16x16.png";
 
   // common extensions
@@ -85,7 +90,7 @@ public abstract class Constants {
 
   // main css style
   public final static String STYLES_ROOT = "/styles/";
-  public final static String MAIN_STYLE  = STYLES_ROOT + "appStyle.css";
+  public final static String MAIN_STYLE  = STYLES_ROOT + "appStyle-";
 
   // message keys
   public final static String I18N_ROOT = "fr.perso.nfelix.app.ui.views.i18n.";
@@ -103,5 +108,11 @@ public abstract class Constants {
   public final static String LINE_SEP = DSystemUtils.getProperty("line.separator");
 
   public final static String ENCODED_PWD = "$2a$10$ESxDFX3KJNcR9kWTaILWfOsVypbkVDfTLb7xkWKPcoxXIBH9EkLTm";
+
+  /** Short date save pattern */
+  public static final String SAVE_PATTERN_DATE    = "yyyyMMdd";
+  /** Date display pattern */
+  public static final String DISPLAY_PATTERN_DATE = "dd/MM/yyyy";
+  public static final String FORMAT_DURATION_HMS  = "H:mm:ss";
 
 }

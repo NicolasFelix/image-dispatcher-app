@@ -1,7 +1,7 @@
 package fr.perso.nfelix.app.ui.config.editor;
 
+import static fr.perso.nfelix.app.ui.typedef.Constants.DISPLAY_PATTERN_DATE;
 import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
-import fr.perso.nfelix.app.utils.sgbd.DalConstants;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -23,7 +23,7 @@ import org.controlsfx.control.PropertySheet;
 @Slf4j
 public class DatePickerPropertyEditor extends CustomAbstractPropertyEditor<String, HBox> {
 
-  private final static String            DATE_PATTERN = DalConstants.DISPLAY_PATTERN_DATE;
+  private final static String            DATE_PATTERN = DISPLAY_PATTERN_DATE;
   private final static DateTimeFormatter DT_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN).withLocale(Locale.FRENCH);
 
   public DatePickerPropertyEditor(PropertySheet.Item property) {

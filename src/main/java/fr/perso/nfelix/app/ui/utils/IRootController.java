@@ -30,4 +30,5 @@ public interface IRootController {
    * @return true if removed
    */
   boolean resetView(final String fxmlKey);
+
 }

@@ -20,9 +20,9 @@ import org.apache.commons.lang3.StringUtils;
 @EqualsAndHashCode(doNotUseGetters = true, callSuper = true)
 public class ImportConfig extends AbstractPropertySheetBean {
 
-  public static final String[] IMPORTFOLDER_KEY    = { "importFolder", "Répertoire contenant les images à intégrer/scanner" };
-  public static final String[] SCANFOLDER_KEY      = { "scanFolder", "Répertoire de sortie" };
-  public static final String[] DUPLICATEFOLDER_KEY = { "duplicateFolder", "Répertoire de sortie des images trouvées en doublon" };
+  public static final String[] IMPORTFOLDER_KEY    = { "importFolder", "R\u00e9pertoire contenant les images \u00e0 int\u00e9grer/scanner" };
+  public static final String[] SCANFOLDER_KEY      = { "scanFolder", "R\u00e9pertoire de sortie" };
+  public static final String[] DUPLICATEFOLDER_KEY = { "duplicateFolder", "R\u00e9pertoire de sortie des images trouv\u00e9es en doublon" };
 
   private String importFolder;
   private String scanFolder;

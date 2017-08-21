@@ -1,6 +1,6 @@
 package fr.perso.nfelix.app.ui.services;
 
-import static fr.perso.nfelix.app.utils.sgbd.DalConstants.FORMAT_DURATION_HMS;
+import static fr.perso.nfelix.app.ui.typedef.Constants.FORMAT_DURATION_HMS;
 
 import fr.perso.nfelix.app.ui.controllers.IUpdatableUI;
 import java.text.MessageFormat;
@@ -44,6 +44,9 @@ public class ServiceSingleRunResult {
   @Getter
   private long expectedNumber = -1L;
 
+  /**
+   * reset
+   */
   public void reset() {
     failed = new AtomicLong();
     succeeded = new AtomicLong();
@@ -61,12 +64,22 @@ public class ServiceSingleRunResult {
     return failed.incrementAndGet();
   }
 
+  /**
+   * increment success counter (and get value)
+   *
+   * @return current value
+   */
   public long incrementSucceeded() {
     long ret = succeeded.incrementAndGet();
     dumpProgress(ret + getSkipped());
     return ret;
   }
 
+  /**
+   * increment skipped counter (and get value)
+   *
+   * @return current value
+   */
   public long incrementSkipped() {
     long ret = skipped.incrementAndGet();
     dumpProgress(ret + getSucceeded());
