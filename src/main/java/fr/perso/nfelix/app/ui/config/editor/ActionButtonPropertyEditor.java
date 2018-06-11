@@ -28,6 +28,12 @@ public class ActionButtonPropertyEditor extends CustomAbstractPropertyEditor<Boo
     this(property, control, true);
   }
 
+  /**
+   * constructor
+   * @param property property item
+   * @param control control linked to this propoerty
+   * @param readonly read-only mode ?
+   */
   public ActionButtonPropertyEditor(PropertySheet.Item property, Button control, boolean readonly) {
     super(property, control, readonly);
 
@@ -58,6 +64,11 @@ public class ActionButtonPropertyEditor extends CustomAbstractPropertyEditor<Boo
     // osef
   }
 
+  /**
+   * action handler definition
+   * @param button source button
+   * @param beanProperty bean properties
+   */
   public static void addActionHandler(ButtonBase button, CustomBeanProperty beanProperty) {
 
     String eh = (String) beanProperty.getProperty(EVENT_HANDLER_KEY);
