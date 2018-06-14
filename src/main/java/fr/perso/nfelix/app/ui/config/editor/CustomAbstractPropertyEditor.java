@@ -5,7 +5,7 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
 
 /**
- * {@link org.controlsfx.property.editor.AbstractPropertyEditor}
+ * extended  {@link org.controlsfx.property.editor.AbstractPropertyEditor}
  *
  * @author N.FELIX
  */

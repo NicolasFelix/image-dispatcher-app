@@ -1,7 +1,6 @@
 package fr.perso.nfelix.app.ui.config.editor;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -26,12 +25,14 @@ import org.controlsfx.control.IndexedCheckModel;
  * Note: this class only deals with String data/values
  * </pre>
  *
+ * @param <S> The type of the TableView
  * @author N.FELIX
  */
 @Slf4j
 public class CheckComboBoxTableCell<S> extends TableCell<S, String> {
 
-  public static final String OFFICE_SEP = ",";
+  /** separator */
+  public static final String ITEM_SEP = ",";
 
   // --- converter
   private ObjectProperty<StringConverter<String>> converter = new SimpleObjectProperty<>(this, "converter");
@@ -130,7 +131,6 @@ public class CheckComboBoxTableCell<S> extends TableCell<S, String> {
     return items;
   }
 
-  /** {@inheritDoc} */
   @Override
   public void startEdit() {
     if(!isEditable() || !getTableView().isEditable() || !getTableColumn().isEditable()) {
@@ -144,7 +144,7 @@ public class CheckComboBoxTableCell<S> extends TableCell<S, String> {
     // initialize checked items
     final IndexedCheckModel<String> ckModel = ckComboBox.getCheckModel();
     if(StringUtils.isNotBlank(this.getItem())) {
-      final String[] split = this.getItem().split(OFFICE_SEP);
+      final String[] split = this.getItem().split(ITEM_SEP);
       Arrays.stream(split).forEach(ckModel::check);
     }
 
@@ -161,7 +161,6 @@ public class CheckComboBoxTableCell<S> extends TableCell<S, String> {
     setGraphic(null);
   }
 
-  /** {@inheritDoc} */
   @Override
   public void updateItem(String item, boolean empty) {
     super.updateItem(item, empty);
@@ -169,7 +168,7 @@ public class CheckComboBoxTableCell<S> extends TableCell<S, String> {
   }
 
   private void updateItem(final Cell<String> cell, final StringConverter<String> converter, final HBox hbox, final Node graphic,
-      final CheckComboBox<String> comboBox) {
+                          final CheckComboBox<String> comboBox) {
     if(cell.isEmpty()) {
       cell.setText(null);
       cell.setGraphic(null);
@@ -198,13 +197,13 @@ public class CheckComboBoxTableCell<S> extends TableCell<S, String> {
   }
 
   private CheckComboBox<String> createCheckComboBox(final Cell<String> cell, final ObservableList<String> items,
-      final ObjectProperty<StringConverter<String>> converter) {
+                                                    final ObjectProperty<StringConverter<String>> converter) {
     CheckComboBox<String> comboBox = new CheckComboBox<>(items);
     comboBox.converterProperty().bind(converter);
     comboBox.setMaxWidth(Double.MAX_VALUE);
     comboBox.getCheckModel().getCheckedItems().addListener((ListChangeListener<? super String>) c -> {
       // LOGGER.info("selection changed : '{}'", c);
-      String value = comboBox.getCheckModel().getCheckedItems().stream().collect(Collectors.joining(OFFICE_SEP));
+      String value = String.join(ITEM_SEP, comboBox.getCheckModel().getCheckedItems());
 
       cell.commitEdit(value);
     });
@@ -256,7 +255,7 @@ public class CheckComboBoxTableCell<S> extends TableCell<S, String> {
    * work on the type of element contained within the TableColumn.
    */
   public static <S> Callback<TableColumn<S, String>, TableCell<S, String>> forTableColumn(final StringConverter<String> converter,
-      final ObservableList<String> items) {
+                                                                                          final ObservableList<String> items) {
     return list -> new CheckComboBoxTableCell<>(converter, items);
   }
 }

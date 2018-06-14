@@ -18,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.Notifications;
 
@@ -42,11 +43,13 @@ public class JobWorkProgressFragment extends AbstractFxFragment {
   @FXML
   private Button cancelButton;
 
+  @Getter
   private TaskProgressData taskData = new TaskProgressData();
 
   @Override
   public void onUpdateText(String msg) {
     Platform.runLater(() -> {
+      LOGGER.debug(msg);
       progressArea.appendText(msg);
       progressArea.appendText(LINE_SEP);
     });

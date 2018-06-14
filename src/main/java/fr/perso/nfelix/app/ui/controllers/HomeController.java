@@ -63,8 +63,6 @@ public class HomeController extends AbstractFxController {
   @FXML
   private JobWorkProgressFragment jobProgressFragmentController;
 
-  private TaskProgressData taskData = new TaskProgressData();
-
   @FXML
   private Button runButton;
 
@@ -275,11 +273,12 @@ public class HomeController extends AbstractFxController {
   private FindAndDispatchImgService buildDispatchService() {
     LOGGER.debug(">>> buildDispatchService");
 
-    taskData.reset();
+    jobProgressFragmentController.clear();
     FindAndDispatchImgService findAndDispatchImgService = new FindAndDispatchImgService(jobProgressFragmentController);
 
     try {
       findAndDispatchImgService.setResources(getResources());
+      final TaskProgressData taskData = jobProgressFragmentController.getTaskData();
       findAndDispatchImgService.setTaskData(taskData);
 
       findAndDispatchImgService.preValidate();
@@ -294,7 +293,7 @@ public class HomeController extends AbstractFxController {
       // cancel event
       findAndDispatchImgService.setOnCancelled(event -> displayNotification(false, "cancel"));
       // success event
-      findAndDispatchImgService.setOnSucceeded(event -> displayNotification(false, "ok"));
+      findAndDispatchImgService.setOnSucceeded(event -> displayNotification(false,  taskData.isCancelled() ? "cancel" : "ok"));
       return findAndDispatchImgService;
     }
     catch(Exception e) {

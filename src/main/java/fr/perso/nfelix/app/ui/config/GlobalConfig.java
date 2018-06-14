@@ -38,9 +38,11 @@ public class GlobalConfig extends AbstractPropertySheetBean {
   private final static ComboWithIconStruct   LOG_OFF              = new ComboWithIconStruct(OFF_LEVEL, OFF_LEVEL, OFF_LOG_LEVEL_ICON);
   final static         ComboWithIconStruct[] AVAILABLE_LOG_LEVELS = { LOG_DEBUG, LOG_INFO, LOG_OFF };
 
+  /** dark theme constant */
   public final static  String                DARK_THEME       = "dark";
   /** light theme constant */
   public final static  String                LIGHT_THEME      = "light";
+  
   private final static ComboWithIconStruct   THEME_DARK       = new ComboWithIconStruct(DARK_THEME, DARK_THEME, DARK_THEME_ICON);
   private final static ComboWithIconStruct   THEME_LIGHT      = new ComboWithIconStruct(LIGHT_THEME, LIGHT_THEME, LIGHT_THEME_ICON);
   final static         ComboWithIconStruct[] AVAILABLE_THEMES = { THEME_DARK, THEME_LIGHT };
@@ -83,6 +85,9 @@ public class GlobalConfig extends AbstractPropertySheetBean {
     return super.getPropertyType(propName);
   }
 
+  /**
+   * reset log level
+   */
   public void resetLogLevel() {
     Logger root = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
     if(root instanceof ch.qos.logback.classic.Logger) {

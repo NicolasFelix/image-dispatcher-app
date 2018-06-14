@@ -51,7 +51,7 @@ public class GlobalConfigBeanInfo extends AbstractBeanAware {
 
       pds.add(buildPropertyDescriptor(DUMPSTEP_KEY, order));
 
-      return pds.toArray(new PropertyDescriptor[pds.size()]);
+      return pds.toArray(new PropertyDescriptor[0]);
     }
     catch(IntrospectionException ie) {
       LOGGER.error("error while inspecting bean: " + ie.getLocalizedMessage(), ie);

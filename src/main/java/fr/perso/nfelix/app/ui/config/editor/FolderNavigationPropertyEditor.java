@@ -26,7 +26,9 @@ import org.controlsfx.control.PropertySheet;
 @Slf4j
 public class FolderNavigationPropertyEditor extends CustomAbstractPropertyEditor<String, HBox> {
 
+  /** default open button id */
   public final static String OPEN_BUTTON_ID  = "openButtonID";
+  /** default clean button id */
   public final static String CLEAN_BUTTON_ID = "cleanButtonID";
 
   public FolderNavigationPropertyEditor(PropertySheet.Item property) {
@@ -45,7 +47,7 @@ public class FolderNavigationPropertyEditor extends CustomAbstractPropertyEditor
     openButton.setGraphic(new ImageView(new Image(FOLDER_ICON)));
     openButton.setId(OPEN_BUTTON_ID);
     openButton.setTooltip(new Tooltip("Parcourir")); // no i18n
-    if(property != null && property instanceof CustomBeanProperty) {
+    if(property instanceof CustomBeanProperty) {
       ActionButtonPropertyEditor.addActionHandler(openButton, (CustomBeanProperty) property);
     }
     children.add(openButton);
@@ -54,7 +56,7 @@ public class FolderNavigationPropertyEditor extends CustomAbstractPropertyEditor
     cleanButton.setId(CLEAN_BUTTON_ID);
     openButton.setTooltip(new Tooltip("Vider la valeur")); // no i18n
     cleanButton.setGraphic(new ImageView(new Image(EMPTY_ICON)));
-    if(property != null && property instanceof CustomBeanProperty) {
+    if(property instanceof CustomBeanProperty) {
       ActionButtonPropertyEditor.addActionHandler(cleanButton, (CustomBeanProperty) property);
     }
     children.add(cleanButton);

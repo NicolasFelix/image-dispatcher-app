@@ -27,6 +27,7 @@ import org.controlsfx.control.PropertySheet;
 @Slf4j
 public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<String, ComboBox> {
 
+  /** items key */
   public final static String ITEMS_KEY = "items";
 
   private List<ComboWithIconStruct> items = null;
@@ -44,6 +45,7 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
     initList(property, control);
   }
 
+  @SuppressWarnings("unchecked")
   private void initList(PropertySheet.Item property, ComboBox control) {
     if(property instanceof CustomBeanProperty) {
       items = (List<ComboWithIconStruct>) ((CustomBeanProperty) property).getProperty(ITEMS_KEY);
@@ -60,19 +62,20 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
       LOGGER.warn("property is not a CustomPropertyDescriptor clazz !");
     }
 
-    final ComboWithIconPropertyEditor _this = this;
     // create custom cell
-    control.setCellFactory(list -> new ColorRectCell(_this));
+    control.setCellFactory(list -> new ColorRectCell(this));
   }
 
-  @Override
-  protected ObservableValue<String> getObservableValue() {
-    return getEditor().getSelectionModel().selectedItemProperty();
-  }
-
+  @SuppressWarnings("unchecked")
   @Override
   public void setValue(String value) {
     getEditor().getSelectionModel().select(value);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  protected ObservableValue<String> getObservableValue() {
+    return getEditor().getSelectionModel().selectedItemProperty();
   }
 
   /**
@@ -80,7 +83,7 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
    */
   private static class ColorRectCell extends ListCell<String> {
 
-    private List<ComboWithIconStruct> availableItems = null;
+    private List<ComboWithIconStruct> availableItems;
 
     public ColorRectCell(ComboWithIconPropertyEditor editor) {
       super();
@@ -109,6 +112,9 @@ public class ComboWithIconPropertyEditor extends CustomAbstractPropertyEditor<St
     }
   }
 
+  /**
+   * structure holding Cpombo and Icon data
+   */
   @Getter
   @Setter
   @AllArgsConstructor

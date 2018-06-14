@@ -6,6 +6,7 @@ import lombok.Setter;
 /**
  * AbstractThreadedService
  *
+ * @param <V> result type
  * @author N.FELIX
  */
 public abstract class AbstractThreadedService<V> extends CancellableService<V> {

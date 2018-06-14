@@ -111,7 +111,7 @@ public class ServiceSingleRunResult {
         long totalTimeMs = (timeMillis - startDate.getTime());
         long stepTimeMs = (timeMillis - stepStartDate.getTime());
         long itemLeft = expectedNumber - currentValue;
-        long estimatedTimeLeftMs = (itemLeft * totalTimeMs) / currentValue;
+        long estimatedTimeLeftMs = Math.max((itemLeft * totalTimeMs) / currentValue, 1);
 
         ui.onUpdateText(MessageFormat
             .format("{0} request(s) treated in {1} ms ({2} ms/req, last {3} : {4} ms/req)  // ({5} skipped, {6} error(s)) [Left items:{7}, time:''{8}'']",

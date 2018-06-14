@@ -24,9 +24,9 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 public abstract class CancellableService<V> extends Service<V> {
 
   @Setter
-  protected TaskProgressData taskData = new TaskProgressData();
+  protected TaskProgressData taskData; // = new TaskProgressData();
 
-  @Getter(AccessLevel.PROTECTED)
+  @Getter
   protected IUpdatableUI updatableUI;
 
   /**
@@ -55,7 +55,7 @@ public abstract class CancellableService<V> extends Service<V> {
    *
    * @return true if cancelled ?
    */
-  protected boolean isOperationCancelled() {
+  public boolean isOperationCancelled() {
     return taskData != null && taskData.isCancelled();
   }
 

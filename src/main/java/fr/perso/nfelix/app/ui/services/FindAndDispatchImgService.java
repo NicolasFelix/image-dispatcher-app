@@ -13,7 +13,7 @@ import fr.perso.nfelix.app.exception.ConfigurationException;
 import fr.perso.nfelix.app.ui.config.ImportConfig;
 import fr.perso.nfelix.app.ui.controllers.IUpdatableUI;
 import fr.perso.nfelix.app.ui.services.utils.CallbackByteChannel;
-import fr.perso.nfelix.app.ui.services.utils.ProgressCallBack;
+import fr.perso.nfelix.app.ui.services.utils.HugeCopyCallback;
 import fr.perso.nfelix.app.utils.ApplicationHolder;
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -21,11 +21,14 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import javafx.concurrent.Task;
 import lombok.Setter;
@@ -43,20 +46,26 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 @Slf4j
 public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> implements IPreValidateService {
 
-  private final static int    QUEUE_CAPACITY = 10000;
-  private final static Object LOCK           = new Object();
+  private final static int    HUGE_FILE_SIZELIMIT = 1024 * 1024 * 15;
+  private final static int    QUEUE_CAPACITY      = 10000;
+  private final static Object LOCK                = new Object();
 
-  private final static DateTimeFormatter FULL_DAY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private final static DateTimeFormatter YEAR_FORMATTER     = DateTimeFormatter.ofPattern("yyyy");
-  private final static DateTimeFormatter MONTH_FORMATTER    = DateTimeFormatter.ofPattern("MM - MMMM");
-  private final static DateTimeFormatter DAY_FORMATTER      = DateTimeFormatter.ofPattern("dd");
+  private final static DateTimeFormatter FULL_DAY_FORMATTER      = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private final static DateTimeFormatter YEAR_FORMATTER          = DateTimeFormatter.ofPattern("yyyy");
+  private final static DateTimeFormatter MONTH_FORMATTER         = DateTimeFormatter.ofPattern("MM - MMMM");
+  private final static DateTimeFormatter DAY_FORMATTER           = DateTimeFormatter.ofPattern("dd");
+  private final static DateTimeFormatter FULL_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
   private final static String[] MOVIE_EXT = { "mov", "avi", "mp4", "3gp" };
 
   @Setter
   private ResourceBundle resources;
 
-  private JobRejectedExecutionHandler rejectedHanlder = new JobRejectedExecutionHandler();
+  private ExecutorService             hugeFileThreadPool = Executors.newFixedThreadPool(4);
+  private JobRejectedExecutionHandler rejectedHanlder    = new JobRejectedExecutionHandler();
+
+  private DispatcherConfig config = null;
+  private ZoneId           zoneId = null;
 
   public FindAndDispatchImgService(IUpdatableUI updatableUI) {
     super(updatableUI);
@@ -75,6 +84,16 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     this.resources = resources;
   }
 
+  private void clear() {
+    config = null;
+    zoneId = null;
+  }
+
+  private void init() {
+    config = ApplicationHolder.getINSTANCE().getConfig();
+    getZoneId();
+  }
+
   @Override
   protected Task<Boolean> createTask() {
     return new Task<Boolean>() {
@@ -83,7 +102,8 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
           throws Exception {
 
         LOGGER.debug(">>> call");
-        final DispatcherConfig config = ApplicationHolder.getINSTANCE().getConfig();
+        clear();
+        init();
 
         ServiceSingleRunResult ssrr = new ServiceSingleRunResult(updatableUI);
         ssrr.setStepFilter(config.getGlobalConfig().getDumpStep());
@@ -92,11 +112,10 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
           final ImportConfig importConfig = config.getImportConfig();
           String inPath = importConfig.getImportFolder();
           String outPath = importConfig.getScanFolder();
-          String duplicatePath = importConfig.getDuplicateFolder();
           final Path sourceDir = Paths.get(inPath);
           final Path targetDir = Paths.get(outPath);
 
-          final Map<LocalDate, List<String>> imgsPerDay = getFileList(sourceDir);
+          final Map<Temporal, List<String>> imgsPerDay = getFileList(sourceDir);
           LOGGER.info(">>> parsing result <<<");
           AtomicLong total = new AtomicLong();
           imgsPerDay.forEach((day, imgs) -> {
@@ -111,30 +130,28 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
             ssrr.setExpectedNumber(totalImgFound);
             Files.createDirectories(targetDir);
             // copy them to target
-            imgsPerDay.keySet().parallelStream().forEach(day -> {
+            ForkJoinPool customThreadPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+            customThreadPool.submit(() -> imgsPerDay.keySet().parallelStream().forEach(day -> {
 
-              // if(isOperationCancelled()) {
-              //   bre
-              // };
               List<String> imgs = imgsPerDay.get(day);
               LOGGER.info(">>> starting group '{}' ({} items)", day, imgs.size());
 
               Path subOut = Paths.get(outPath, YEAR_FORMATTER.format(day), MONTH_FORMATTER.format(day), DAY_FORMATTER.format(day));
-              Path duplicateOut = null;
-              if(StringUtils.isNotBlank(duplicatePath)) {
-                duplicateOut = Paths.get(duplicatePath, YEAR_FORMATTER.format(day), MONTH_FORMATTER.format(day), DAY_FORMATTER.format(day));
-              }
               try {
                 Files.createDirectories(subOut);
 
                 for(String img : imgs) {
+                  if(isOperationCancelled()) {
+                    break;
+                  }
 
                   Path source = Paths.get(img);
-                  Path destination = Paths.get(subOut.toString(), FilenameUtils.getName(img));
+                  final String name = computeFileName(img);
+                  Path destination = Paths.get(subOut.toString(), name);
 
                   if(Files.exists(destination)) {
                     try {
-                      destination = getFinalPath(subOut, img, duplicateOut);
+                      destination = getFinalPath(subOut, img);
                       if(destination == null) {
                         ssrr.incrementSkipped();
                         continue;
@@ -148,18 +165,17 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
                   copyFile(source, destination, ssrr);
                 }
               }
-              catch(IOException e) {
-                LOGGER.warn("error while dealing with files from day '{}'", FULL_DAY_FORMATTER.format(day));
-                ssrr.incrementFailed();
-              }
               catch(Exception e) {
                 LOGGER.warn("error while dealing with files from day '{}'", FULL_DAY_FORMATTER.format(day));
+                LOGGER.error(e.getLocalizedMessage(), e);
                 ssrr.incrementFailed();
               }
               finally {
                 LOGGER.info("<<< group '{}' done ({} items)", day, imgs.size());
               }
-            });
+            }));
+
+            awaitTerminationAfterShutdown(customThreadPool);
 
             final long timeMillis = System.currentTimeMillis();
             long totalTimeMs = (timeMillis - ssrr.getStartDate().getTime());
@@ -167,6 +183,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
                 DurationFormatUtils.formatDuration(totalTimeMs, FORMAT_DURATION_HMS), totalTimeMs / Math.max(1, ssrr.getTotalRead()), ssrr.getSkipped(),
                 ssrr.getFailed());
           }
+          awaitTerminationAfterShutdown(hugeFileThreadPool);
         }
         catch(IOException e) {
           LOGGER.error(e.getLocalizedMessage(), e);
@@ -174,17 +191,57 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
         finally {
           LOGGER.info("<<< runJobs (service started)");
         }
+
         return true;
       }
     };
   }
 
+  private void awaitTerminationAfterShutdown(ExecutorService threadPool) {
+    LOGGER.debug("shuting down tread pool !!");
+    threadPool.shutdown();
+    try {
+      if(!threadPool.awaitTermination(10, TimeUnit.MINUTES)) {
+        LOGGER.info("shuting down tread pool NOW (1) !!");
+        threadPool.shutdownNow();
+      }
+      else {
+        LOGGER.info("Thread pool terminated !!");
+      }
+    }
+    catch(InterruptedException ex) {
+      LOGGER.warn("shuting down tread pool NOW (1) !!");;
+      threadPool.shutdownNow();
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  private String computeFileName(String inputFilePath) {
+    ImportConfig ic = this.config.getImportConfig();
+    if(ic.isRenameFile()) {
+      try {
+        Temporal fileOriginalDate = null;
+        if(isMovie(inputFilePath)) {
+          fileOriginalDate = getLocalDateFromDateCreation(inputFilePath, true);
+        }
+        else {
+          fileOriginalDate = getFileOriginalDateTime(inputFilePath, true);
+        }
+        return FULL_DATETIME_FORMATTER.format(fileOriginalDate) + "." + FilenameUtils.getExtension(inputFilePath);
+      }
+      catch(ImageProcessingException | IOException e) {
+        LOGGER.error("Error while getting file date");
+      }
+    }
+    return FilenameUtils.getName(inputFilePath);
+  }
+
   private void copyFile(Path source, Path destination, ServiceSingleRunResult ssrr)
       throws IOException {
 
-    // moree than 20Mo
-    if(Files.size(source) > 1024 * 1024 * 20) {
+    // more than 15Mo
 
+    if(Files.size(source) > HUGE_FILE_SIZELIMIT) {
       copyHugeFile(source, destination, ssrr);
     }
     else {
@@ -201,41 +258,37 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
 
   private void copyHugeFile(Path source, Path destination, ServiceSingleRunResult ssrr)
       throws IOException {
-    ProgressCallBack progressCallBack = new ProgressCallBack() {
-
-      double latestProgress = -1d;
-      private final int STEP = 5;
-
-      @Override
-      public void callback(CallbackByteChannel rbc, double progress) {
-        // System.out.println(rbc.getReadSoFar());
-        if(latestProgress == -1) {
-          latestProgress = progress;
-        }
-        if((progress - latestProgress) > STEP) {
-          latestProgress = progress;
-          System.out.println(latestProgress);
-        }
-      }
-    };
 
     // huge copy with callaback
+    CancellableService service = this;
 
-    try(FileInputStream fis = new FileInputStream(source.toFile());
-        FileChannel srcChannel = fis.getChannel();
-        FileOutputStream fos = new FileOutputStream(destination.toFile());
-        FileChannel dstChannel = fos.getChannel()) {
+    LOGGER.info("copying huge file {}", source.getFileName().toString());
 
-      ReadableByteChannel rbc = new CallbackByteChannel(srcChannel, Files.size(source), progressCallBack);
-      dstChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+    hugeFileThreadPool.submit(() -> {
+      try(FileInputStream fis = new FileInputStream(source.toFile());
+          FileChannel srcChannel = fis.getChannel();
+          FileOutputStream fos = new FileOutputStream(destination.toFile());
+          FileChannel dstChannel = fos.getChannel()) {
+
+        ReadableByteChannel rbc = new CallbackByteChannel(srcChannel, Files.size(source), new HugeCopyCallback(source, service));
+        dstChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+        ssrr.incrementSucceeded();
+      }
+      catch(IOException ioe) {
+        LOGGER.warn("error while copying file '{}' to '{}'", source, destination);
+        ssrr.incrementFailed(); // done later
+        // throw ioe;
+      }
+      // catch(InterruptedException ie) {
+      //   LOGGER.warn("error while copying file '{}' to '{}'", source, destination);
+      //   ssrr.incrementSkipped(); // done
+      // }
+    });
+    // worker.start();
+
+    if(!isOperationCancelled()) {
+      ssrr.incrementSucceeded();
     }
-    catch(IOException ioe) {
-      LOGGER.warn("error while copying file '{}' to '{}'", source, destination);
-      // ssrr.incrementFailed(); // done later
-      throw ioe;
-    }
-
-    ssrr.incrementSucceeded();
   }
 
   @Override
@@ -249,7 +302,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     return Arrays.stream(MOVIE_EXT).anyMatch(movExt -> StringUtils.equalsIgnoreCase(movExt, fileExt));
   }
 
-  private LocalDate getFileOriginalDateTime(String fPath)
+  private Temporal getFileOriginalDateTime(String fPath, boolean fullDate)
       throws ImageProcessingException, IOException {
     Metadata metadata = null;
     try {
@@ -257,34 +310,41 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     }
     catch(ImageProcessingException ipe) {
       LOGGER.warn("error while getting '" + fPath + "' metadata. " + ipe.getLocalizedMessage(), ipe);
-      return getFileSystemDateTime(fPath);
+      return getFileSystemDateTime(fPath, fullDate);
     }
+
     ExifSubIFDDirectory directory = (metadata != null) ? metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class) : null;
     if(directory == null) {
       LOGGER.warn("no EXIF directory found for file '{}'", fPath);
-      return getFileSystemDateTime(fPath);
+      return getFileSystemDateTime(fPath, fullDate);
     }
 
     // query the tag's value
     Date dateOri = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
     if(dateOri == null) {
       LOGGER.warn("no date found for file '{}'", fPath);
-      return null;
+      return getFileSystemDateTime(fPath, fullDate);
     }
-    final String dayString = dateOri.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(FULL_DAY_FORMATTER);
+
+    if(fullDate) {
+      final String dayString = dateOri.toInstant().atZone(getZoneId()).toLocalDateTime().format(FULL_DATETIME_FORMATTER);
+      return LocalDateTime.parse(dayString, FULL_DATETIME_FORMATTER);
+    }
+
+    final String dayString = dateOri.toInstant().atZone(getZoneId()).toLocalDate().format(FULL_DAY_FORMATTER);
     return LocalDate.parse(dayString, FULL_DAY_FORMATTER);
   }
 
-  private LocalDate getFileSystemDateTime(String fPath) {
+  private Temporal getFileSystemDateTime(String fPath, boolean fullDate) {
 
     try {
       final BasicFileAttributes bfAtt = Files.readAttributes(Paths.get(fPath), BasicFileAttributes.class);
-      final FileTime lastModifiedFT = bfAtt.lastModifiedTime();
-      final FileTime creationFT = bfAtt.creationTime();
-      if(creationFT.compareTo(lastModifiedFT) < 0) {
-        return LocalDate.parse(FULL_DAY_FORMATTER.withLocale(Locale.FRENCH).withZone(ZoneId.systemDefault()).format(creationFT.toInstant()));
+      final FileTime fileFT = (bfAtt.creationTime().compareTo(bfAtt.lastModifiedTime()) < 0) ? bfAtt.creationTime() : bfAtt.lastModifiedTime();
+
+      if(fullDate) {
+        return LocalDateTime.parse(FULL_DATETIME_FORMATTER.withLocale(Locale.FRENCH).withZone(getZoneId()).format(fileFT.toInstant()));
       }
-      return LocalDate.parse(FULL_DAY_FORMATTER.withLocale(Locale.FRENCH).withZone(ZoneId.systemDefault()).format(lastModifiedFT.toInstant()));
+      return LocalDate.parse(FULL_DAY_FORMATTER.withLocale(Locale.FRENCH).withZone(getZoneId()).format(fileFT.toInstant()));
     }
     catch(Throwable ioe) {
       LOGGER.error("error while getting File attribut: " + ioe.getLocalizedMessage(), ioe);
@@ -292,10 +352,10 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     return null;
   }
 
-  private Map<LocalDate, List<String>> getFileList(final Path sourceDir)
+  private Map<Temporal, List<String>> getFileList(final Path sourceDir)
       throws IOException {
     LOGGER.debug(">>> getFileList");
-    Map<LocalDate, List<String>> files = new TreeMap<>();
+    Map<Temporal, List<String>> files = new TreeMap<>();
 
     Files.walkFileTree(sourceDir, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
       @Override
@@ -314,11 +374,11 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
         }
 
         try {
-          LocalDate dayImg = null;
+          Temporal dayImg = null;
           if(fType == FileType.Unknown) {
             boolean movie = isMovie(fPath);
             if(movie) {
-              dayImg = getLocalDateFromDateCreation(fPath);
+              dayImg = getLocalDateFromDateCreation(fPath, false);
             }
             else {
               LOGGER.warn("file '{}' unknown !", fPath);
@@ -329,9 +389,9 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
           // else {
           // get date  obtain the Exif directory
           if(dayImg == null) {
-            dayImg = getFileOriginalDateTime(fPath);
+            dayImg = getFileOriginalDateTime(fPath, false);
             if(dayImg == null) {
-              dayImg = getLocalDateFromDateCreation(fPath);
+              dayImg = getLocalDateFromDateCreation(fPath, false);
             }
             if(dayImg == null) {
               return FileVisitResult.CONTINUE;
@@ -363,50 +423,40 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     return files;
   }
 
-  private LocalDate getLocalDateFromDateCreation(String fPath)
+  private Temporal getLocalDateFromDateCreation(String fPath, boolean fullDate)
       throws IOException {
-    LocalDate dayImg;
     final BasicFileAttributes basicFileAttributes = Files.readAttributes(Paths.get(fPath), BasicFileAttributes.class);
     final FileTime lastModifiedTime = basicFileAttributes.lastModifiedTime();
     final Instant instant = lastModifiedTime.toInstant();
-    dayImg = instant.atZone(ZoneId.systemDefault()).toLocalDate();
-    return dayImg;
+    if(fullDate) {
+      return instant.atZone(getZoneId()).toLocalDateTime();
+    }
+    return instant.atZone(getZoneId()).toLocalDate();
   }
 
   /**
    * get final path, if image is different from existing one
    *
-   * @param subOut       folder
-   * @param img          image name
-   * @param duplicateOut duplicated path
+   * @param subOut folder
+   * @param img    image name
    * @return final image path, or null if image is already present...
    */
-  private Path getFinalPath(Path subOut, String img, Path duplicateOut)
+  private synchronized Path getFinalPath(Path subOut, String img)
       throws ImageProcessingException, IOException {
 
     Path destination = Paths.get(subOut.toString(), FilenameUtils.getName(img));
+    if(Files.notExists(destination)) {
+      return destination;
+    }
     Path source = Paths.get(img);
 
     final long szDest = Files.size(destination);
     final long szSrc = Files.size(source);
     if(szSrc == szDest) {
-      final LocalDate sourceDateTime = getFileOriginalDateTime(img);
-      final LocalDate destinaltionDateTime = getFileOriginalDateTime(img);
+      final Temporal sourceDateTime = getFileOriginalDateTime(img, false);
+      final Temporal destinaltionDateTime = getFileOriginalDateTime(img, false);
       if(sourceDateTime != null && destinaltionDateTime != null && sourceDateTime.equals(destinaltionDateTime)) {
-
-        if(duplicateOut != null) {
-          Files.createDirectories(duplicateOut);
-          destination = Paths.get(duplicateOut.toString(), FilenameUtils.getName(img));
-          try {
-            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-          }
-          catch(IOException ioe) {
-            LOGGER.warn("error while copying file '" + source + "' to '" + destination + "': " + ioe.getLocalizedMessage(), ioe);
-          }
-          // copy it to external folder...
-          return null;
-        }
-        LOGGER.info("file '{}' and '{}' hold same orgin dates", source, destination);
+        LOGGER.info("file '{}' and '{}' hold same origin dates", source, destination);
         return null;
       }
     }
@@ -424,5 +474,15 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
       while(Files.exists(destination));
     }
     return destination;
+  }
+
+  private ZoneId getZoneId() {
+    if(zoneId == null) {
+      zoneId = ZoneId.systemDefault();
+      if(config.getImportConfig().getTimeOffset() != 0) {
+        return zoneId.ofOffset("GMT", ZoneOffset.ofHours(config.getImportConfig().getTimeOffset()));
+      }
+    }
+    return zoneId;
   }
 }
