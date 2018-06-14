@@ -262,7 +262,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     // huge copy with callaback
     CancellableService service = this;
 
-    LOGGER.info("copying huge file {}", source.getFileName().toString());
+    LOGGER.info("copying huge file {}", source.getFileName());
 
     hugeFileThreadPool.submit(() -> {
       try(FileInputStream fis = new FileInputStream(source.toFile());

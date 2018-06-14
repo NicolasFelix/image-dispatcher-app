@@ -12,7 +12,7 @@ import java.text.DecimalFormat;
 public class HugeCopyCallback implements ProgressCallBack {
 
   double latestProgress = -1d;
-  private final int           STEP = 10;
+  private final static int           STEP = 10;
   private final DecimalFormat df   = new DecimalFormat("#");
 
   // private final Thread             worker;
@@ -42,7 +42,7 @@ public class HugeCopyCallback implements ProgressCallBack {
     if((progress - latestProgress) > STEP) {
       latestProgress = progress;
       if(updatableUI != null) {
-        updatableUI.onUpdateText("File '" + source.getFileName().toString() + "', backup in progress  (" + df.format(latestProgress) + " %)");
+        updatableUI.onUpdateText("File '" + source.getFileName() + "', backup in progress  (" + df.format(latestProgress) + " %)");
       }
     }
 
