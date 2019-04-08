@@ -35,7 +35,7 @@ import org.apache.commons.cli.*;
  * main application clazz.
  */
 @Slf4j
-public class ImgDispatcherUIApp extends Application {
+public class ImgDispatcherApp extends Application {
 
   private static final int          PORT   = 43666;
   @SuppressWarnings("FieldCanBeLocal")
@@ -102,7 +102,7 @@ public class ImgDispatcherUIApp extends Application {
         }
       }
       // launch application with splashScreen
-      LauncherImpl.launchApplication(ImgDispatcherUIApp.class, ImgDispatcherUIAppPreloader.class, args);
+      LauncherImpl.launchApplication(ImgDispatcherApp.class, ImgDispatcherAppPreloader.class, args);
     }
     catch(Throwable th) {
       LOGGER.error(th.getLocalizedMessage(), th);
@@ -232,6 +232,6 @@ public class ImgDispatcherUIApp extends Application {
    * @param css css file
    */
   public void switchStyle(final String css) {
-    mainCss = ImgDispatcherUIApp.class.getResource(css);
+    mainCss = ImgDispatcherApp.class.getResource(css);
   }
 }

@@ -4,7 +4,7 @@ import static fr.perso.nfelix.app.ui.utils.JavaFXUtils.createDialog;
 import static fr.perso.nfelix.app.utils.DJavaUtils.MAVEN_SNAPSHOT_TOKENS;
 
 import fr.perso.nfelix.app.DispatcherConfig;
-import fr.perso.nfelix.app.ImgDispatcherUIApp;
+import fr.perso.nfelix.app.ImgDispatcherApp;
 import fr.perso.nfelix.app.ui.utils.IRootController;
 import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
 import fr.perso.nfelix.app.ui.utils.SpringContextHolder;
@@ -118,7 +118,7 @@ public abstract class AbstractFxController extends Parent implements IFxControll
   }
 
   @Override
-  public ImgDispatcherUIApp getMainApp() {
+  public ImgDispatcherApp getMainApp() {
     return rootController.getMainApp();
   }
 

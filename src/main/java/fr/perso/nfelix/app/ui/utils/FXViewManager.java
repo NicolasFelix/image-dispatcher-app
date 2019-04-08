@@ -4,7 +4,7 @@ import static fr.perso.nfelix.app.ui.typedef.Constants.*;
 import static fr.perso.nfelix.app.ui.utils.JavaFXUtils.getSafeResourceValue;
 import static fr.perso.nfelix.app.ui.utils.JavaFXUtils.loadResourceBundle;
 
-import fr.perso.nfelix.app.ImgDispatcherUIApp;
+import fr.perso.nfelix.app.ImgDispatcherApp;
 import fr.perso.nfelix.app.ui.controllers.IFxController;
 import fr.perso.nfelix.app.ui.controllers.MainContainer;
 import fr.perso.nfelix.app.utils.ApplicationHolder;
@@ -43,7 +43,7 @@ public class FXViewManager extends StackPane implements IRootController {
   private HashMap<String, ViewCacheItem> screens = new HashMap<>();
 
   @Getter
-  private ImgDispatcherUIApp mainApp = null;
+  private ImgDispatcherApp mainApp = null;
 
   @Getter
   private MainContainer mainContainer;
@@ -56,7 +56,7 @@ public class FXViewManager extends StackPane implements IRootController {
   /**
    * default constructor
    */
-  public FXViewManager(ImgDispatcherUIApp app) {
+  public FXViewManager(ImgDispatcherApp app) {
     super();
     mainApp = app;
   }

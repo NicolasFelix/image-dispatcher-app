@@ -1,7 +1,7 @@
 package fr.perso.nfelix.app.ui.controllers;
 
 import fr.perso.nfelix.app.DispatcherConfig;
-import fr.perso.nfelix.app.ImgDispatcherUIApp;
+import fr.perso.nfelix.app.ImgDispatcherApp;
 import fr.perso.nfelix.app.ui.utils.IRootController;
 import javafx.fxml.Initializable;
 
@@ -34,9 +34,9 @@ public interface IFxController extends Initializable {
   /**
    * get main app
    *
-   * @return {@link ImgDispatcherUIApp}
+   * @return {@link ImgDispatcherApp}
    */
-  ImgDispatcherUIApp getMainApp();
+  ImgDispatcherApp getMainApp();
 
   /**
    * get configuration

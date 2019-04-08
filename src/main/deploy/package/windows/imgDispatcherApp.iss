@@ -1,37 +1,37 @@
 ;This file will be executed next to the application bundle image
-;I.e. current directory will contain folder ExchangeApp with application files
+;I.e. current directory will contain folder imgDispatcherApp with application files
 [Setup]
-AppId={{com.digitech.city.exchange}}
-AppName=ExchangeApp
+AppId={{fr.perso.nfelix}}
+AppName=ImgDispatcherApp
 AppVersion=1.0
-AppVerName=ExchangeApp 1.0
-AppPublisher=Digitech S.A.
-AppComments=ExchangeApp
-AppCopyright=Copyright (C) 2016
+AppVerName=ImgDispatcherApp 1.0
+AppPublisher=LouMéou
+AppComments=ImgDispatcherApp
+AppCopyright=Copyright (C) 2019
 ;AppPublisherURL=http://java.com/
 ;AppSupportURL=http://java.com/
 ;AppUpdatesURL=http://java.com/
-DefaultDirName={localappdata}\ExchangeApp
+DefaultDirName={localappdata}\imgDispatcherApp
 DisableStartupPrompt=Yes
 DisableDirPage=No
 DisableProgramGroupPage=Yes
 DisableReadyPage=Yes
 DisableFinishedPage=Yes
 DisableWelcomePage=Yes
-DefaultGroupName=Digitech S.A.
+DefaultGroupName=LouMéou Corporation
 ;Optional License
 LicenseFile=
 ;WinXP or above
 MinVersion=0,5.1 
-OutputBaseFilename=ExchangeApp
+OutputBaseFilename=imgDispatcherApp
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest
-SetupIconFile=ExchangeApp\ExchangeApp.ico
-UninstallDisplayIcon={app}\ExchangeApp.ico
-UninstallDisplayName=ExchangeApp
+SetupIconFile=imgDispatcherApp\imgDispatcherApp.ico
+UninstallDisplayIcon={app}\imgDispatcherApp.ico
+UninstallDisplayName=imgDispatcherApp
 WizardImageStretch=No
-WizardSmallImageFile=ExchangeApp-setup-icon.bmp   
+WizardSmallImageFile=imgDispatcherApp-setup-icon.bmp
 ArchitecturesInstallIn64BitMode=x64
 
 
@@ -39,21 +39,21 @@ ArchitecturesInstallIn64BitMode=x64
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 
 [Files]
-Source: "ExchangeApp\ExchangeApp.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "ExchangeApp\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "imgDispatcherApp\imgDispatcherApp.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "imgDispatcherApp\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\ExchangeApp"; Filename: "{app}\ExchangeApp.exe"; IconFilename: "{app}\ExchangeApp.ico"; Check: returnFalse()
-Name: "{commondesktop}\ExchangeApp"; Filename: "{app}\ExchangeApp.exe";  IconFilename: "{app}\ExchangeApp.ico"; Check: returnTrue()
+Name: "{group}\imgDispatcherApp"; Filename: "{app}\imgDispatcherApp.exe"; IconFilename: "{app}\imgDispatcherApp.ico"; Check: returnFalse()
+Name: "{commondesktop}\imgDispatcherApp"; Filename: "{app}\imgDispatcherApp.exe";  IconFilename: "{app}\imgDispatcherApp.ico"; Check: returnTrue()
 
 
 [Run]
-Filename: "{app}\ExchangeApp.exe"; Parameters: "-Xappcds:generatecache"; Check: returnFalse()
-Filename: "{app}\ExchangeApp.exe"; Description: "{cm:LaunchProgram,ExchangeApp}"; Flags: nowait postinstall skipifsilent; Check: returnTrue()
-Filename: "{app}\ExchangeApp.exe"; Parameters: "-install -svcName ""ExchangeApp"" -svcDesc ""ExchangeApp"" -mainExe ""ExchangeApp.exe""  "; Check: returnFalse()
+Filename: "{app}\imgDispatcherApp.exe"; Parameters: "-Xappcds:generatecache"; Check: returnFalse()
+Filename: "{app}\imgDispatcherApp.exe"; Description: "{cm:LaunchProgram,imgDispatcherApp}"; Flags: nowait postinstall skipifsilent; Check: returnTrue()
+Filename: "{app}\imgDispatcherApp.exe"; Parameters: "-install -svcName ""imgDispatcherApp"" -svcDesc ""imgDispatcherApp"" -mainExe ""imgDispatcherApp.exe""  "; Check: returnFalse()
 
 [UninstallRun]
-Filename: "{app}\ExchangeApp.exe "; Parameters: "-uninstall -svcName ExchangeApp -stopOnUninstall"; Check: returnFalse()
+Filename: "{app}\imgDispatcherApp.exe "; Parameters: "-uninstall -svcName imgDispatcherApp -stopOnUninstall"; Check: returnFalse()
 
 [Code]
 function returnTrue(): Boolean;

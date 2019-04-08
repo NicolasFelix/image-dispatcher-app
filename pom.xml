@@ -21,19 +21,28 @@
 
     <!-- maven compiler plugin is define into parent -->
     <jdk.version>1.8</jdk.version>
-    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>dd/MM/yyyy-HH:mm:ss</maven.build.timestamp.format>
-    <maven.findbugs.plugin.version>3.0.5-SNAPSHOT</maven.findbugs.plugin.version>
-    <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
-    <maven.reports.plugin.version>2.9</maven.reports.plugin.version>
-    <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
+
+    <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+    <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
+    <maven-war-plugin.version>3.2.2</maven-war-plugin.version>
+    <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+    <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
+    <maven.spotbugs.plugin.version>3.1.5</maven.spotbugs.plugin.version>
+    <maven.checkstyle.plugin.version>3.0.0</maven.checkstyle.plugin.version>
+    <checkstyle.version>8.11</checkstyle.version>
+    <maven.reports.plugin.version>3.0.0</maven.reports.plugin.version>
+    <maven-surefire-report-plugin.version>2.22.0</maven-surefire-report-plugin.version>
+    <maven.javadoc.plugin.version>3.0.1</maven.javadoc.plugin.version>
+    <maven-dependency-check-maven.version>3.2.1</maven-dependency-check-maven.version>
+    <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
 
     <!--<kotlin.version>1.0.3</kotlin.version>-->
     <thymeleaf.version>3.0.7.RELEASE</thymeleaf.version>
 
     <javafx-maven-plugin.version>8.8.3</javafx-maven-plugin.version>
-    <jre.runtime.path>C:\Program Files\Java\jre1.8.0_111</jre.runtime.path>
+    <jre.runtime.path>C:\Program Files\Java\jre1.8.0_201</jre.runtime.path>
 
     <commons-lang3.version>3.6</commons-lang3.version>
     <commons-configuration2.version>2.1.1</commons-configuration2.version>
@@ -51,7 +60,7 @@
       <extension>
         <groupId>com.digitech.commons</groupId>
         <artifactId>build-tools</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.1</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -99,27 +108,62 @@
       </plugins>
     </pluginManagement>
 
+    <!-- plugins -->
     <plugins>
+
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${maven.spotbugs.plugin.version}</version>
+        <configuration>
+          <failOnError>false</failOnError>
+          <effort>Default</effort>
+          <threshold>Default</threshold>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>${maven-site-plugin.version}</version>
+        <configuration>
+          <locales>en</locales>
+          <locales>fr</locales>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>${maven-surefire-report-plugin.version}</version>
       </plugin>
-
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+        <inherited>true</inherited>
         <configuration>
-          <findbugsXmlOutput>true</findbugsXmlOutput>
-          <xmlOutput>true</xmlOutput>
+          <reuseForks>false</reuseForks>
+          <reportFormat>xml</reportFormat>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven.checkstyle.plugin.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>${checkstyle.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
       </plugin>
 
       <!-- addkotlin compiler -->
@@ -212,20 +256,61 @@
   <reporting>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-      </plugin>
-
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>versions-maven-plugin</artifactId>
+      <version>${versions-maven-plugin.version}</version>
+      <reportSets>
+        <reportSet>
+          <reports>
+            <report>dependency-updates-report</report>
+            <report>plugin-updates-report</report>
+          </reports>
+        </reportSet>
+      </reportSets>
+    </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${maven-dependency-check-maven.version}</version>
         <configuration>
-          <configLocation>src/main/resources/digitech_checkstyle.xml</configLocation>
+          <failOnError>false</failOnError>
+          <skipProvidedScope>true</skipProvidedScope>
+          <skipSystemScope>true</skipSystemScope>
+          <versionCheckEnabled>false</versionCheckEnabled>
+          <mavenSettingsProxyId>nexus</mavenSettingsProxyId>
         </configuration>
         <reportSets>
           <reportSet>
             <reports>
-              <report>checkstyle</report>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalOptions>
+            <additionalOption>-Xdoclint:none</additionalOption>
+          </additionalOptions>
+          <noindex>true</noindex>
+          <failOnError>false</failOnError>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <id>default</id>
+            <reports>
+              <report>test-javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <configuration>
+              <aggregate>true</aggregate>
+            </configuration>
+            <reports>
+              <report>aggregate</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -234,21 +319,65 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
+        <configuration>
+          <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+        </configuration>
         <reportSets>
           <reportSet>
             <reports>
-              <report>project-team</report>
-              <report>mailing-list</report>
-              <report>cim</report>
-              <report>issue-tracking</report>
-              <report>scm</report>
-              <report>plugin-management</report>
+              <report>index</report>
               <report>summary</report>
-              <report>dependency-convergence</report>
-              <report>dependency-management</report>
+              <report>team</report>
+              <report>modules</report>
+              <report>ci-management</report>
+              <report>issue-management</report>
+              <report>scm</report>
             </reports>
           </reportSet>
         </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <configuration>
+          <excludeFilterFile>findbugs/digitech_findbugs_excludes.xml</excludeFilterFile>
+          <outputEncoding>UTF-8</outputEncoding>
+          <plugins>
+            <plugin>
+              <groupId>jp.skypencil.findbugs.slf4j</groupId>
+              <artifactId>bug-pattern</artifactId>
+              <version>1.4.1</version>
+            </plugin>
+          </plugins>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <goal>checkstyle-aggregate</goal>
+          <configLocation>checkstyle/digitech_checkstyle.xml</configLocation>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <id>aggregate</id>
+            <reports>
+              <report>checkstyle-aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
       </plugin>
     </plugins>
   </reporting>
@@ -461,7 +590,7 @@
             <configuration>
               <verbose>true</verbose>
               <needShortcut>true</needShortcut>
-              <mainClass>fr.perso.nfelix.image.ImgDispatcherApp</mainClass>
+              <mainClass>fr.perso.nfelix.app.ImgDispatcherApp</mainClass>
               <bundler>EXE</bundler>
               <!--<bundler>windows.app</bundler>-->
               <appName>ImgDispatcherApp</appName>

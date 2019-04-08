@@ -1,30 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="Stresser" xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="${project.name}">
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.6</version>
+  </skin>
+
+  <version position="left"/>
+  <publishDate position="right" format="dd-MM-yyyy"/>
+
   <bannerLeft>
-    <name>Stresser</name>
-    <src>images/logo-left.png</src>
+    <name>Image-dispatcher</name>
+    <src>images/icon-img-dispatcher.png</src>
+    <href>https://github.com/NicolasFelix/image-dispatcher-app</href>
   </bannerLeft>
-  <!-- <publishDate format="dd/MM/YYYY" position="bottom" /> -->
 
   <body>
-    <links>
-      <item name="Apache" href="http://www.apache.org/" />
-      <item name="Maven 2" href="http://maven.apache.org/maven2/"/>
-    </links>
-
-    <menu name="Stresser">
-      <item name="Configuration" href="stresser_setup.html" />
-      <item name="Graph and Statistics generation" href="stresser_graph.html" />
-      <item name="Groovy" href="stresser_groovy.html" />
-      <item name="FAQ" href="stresser_faq.html" />
-    </menu>
-
-    <menu name="Maven 2.0">
-      <item name="Format APT" href="format_APT.html"/>
-    </menu>
-
-    <menu ref="reports" />
+    <menu ref="modules"/>
+    <menu ref="reports"/>
   </body>
-
 </project>

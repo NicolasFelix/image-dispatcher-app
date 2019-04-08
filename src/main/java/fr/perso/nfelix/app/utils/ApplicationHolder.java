@@ -1,7 +1,7 @@
 package fr.perso.nfelix.app.utils;
 
 import fr.perso.nfelix.app.DispatcherConfig;
-import fr.perso.nfelix.app.ImgDispatcherUIApp;
+import fr.perso.nfelix.app.ImgDispatcherApp;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ public class ApplicationHolder {
 
   @Getter
   @Setter
-  private ImgDispatcherUIApp mainApp;
+  private ImgDispatcherApp mainApp;
 
   /**
    * get configuration

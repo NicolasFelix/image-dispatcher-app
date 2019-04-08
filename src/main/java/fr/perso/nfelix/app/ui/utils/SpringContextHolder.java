@@ -2,7 +2,7 @@ package fr.perso.nfelix.app.ui.utils;
 
 import static fr.perso.nfelix.app.ui.typedef.Constants.SPRING_CONTEXT;
 
-import fr.perso.nfelix.app.ImgDispatcherUIApp;
+import fr.perso.nfelix.app.ImgDispatcherApp;
 import fr.perso.nfelix.app.ui.typedef.JobConstants;
 import fr.perso.nfelix.app.utils.spring.SpringApplicationContextHolder;
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public class SpringContextHolder {
 
   private static SpringContextHolder INSTANCE;
 
-  private ImgDispatcherUIApp mainApp;
+  private ImgDispatcherApp mainApp;
 
   /**
    * hidden default constructor
@@ -36,7 +36,7 @@ public class SpringContextHolder {
     super();
   }
 
-  public static void buildSpringContext(ImgDispatcherUIApp mainApp) {
+  public static void buildSpringContext(ImgDispatcherApp mainApp) {
     INSTANCE = new SpringContextHolder();
     INSTANCE.mainApp = mainApp;
   }

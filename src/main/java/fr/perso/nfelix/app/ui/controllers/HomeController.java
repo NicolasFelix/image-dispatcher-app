@@ -5,7 +5,7 @@ import static fr.perso.nfelix.app.ui.utils.JavaFXUtils.createDialog;
 import static fr.perso.nfelix.app.ui.utils.JavaFXUtils.createPasswordDialog;
 
 import fr.perso.nfelix.app.DispatcherConfig;
-import fr.perso.nfelix.app.ImgDispatcherUIAppPreloader;
+import fr.perso.nfelix.app.ImgDispatcherAppPreloader;
 import fr.perso.nfelix.app.ui.controllers.fragments.JobWorkProgressFragment;
 import fr.perso.nfelix.app.ui.services.CancellableService;
 import fr.perso.nfelix.app.ui.services.FindAndDispatchImgService;
@@ -99,7 +99,7 @@ public class HomeController extends AbstractFxController {
       LOGGER.error(th.getLocalizedMessage(), th);
     }
     finally {
-      getMainApp().notifyPreloader(new ImgDispatcherUIAppPreloader.HideNotification());
+      getMainApp().notifyPreloader(new ImgDispatcherAppPreloader.HideNotification());
       LOGGER.debug("<<< initUI");
     }
   }

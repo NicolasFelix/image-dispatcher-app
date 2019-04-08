@@ -1,6 +1,6 @@
 package fr.perso.nfelix.app.ui.utils;
 
-import fr.perso.nfelix.app.ImgDispatcherUIApp;
+import fr.perso.nfelix.app.ImgDispatcherApp;
 
 /**
  * @author N.FELIX
@@ -10,9 +10,9 @@ public interface IRootController {
   /**
    * get main app
    *
-   * @return {@link ImgDispatcherUIApp}
+   * @return {@link ImgDispatcherApp}
    */
-  ImgDispatcherUIApp getMainApp();
+  ImgDispatcherApp getMainApp();
 
   /**
    * switch to view from code/key

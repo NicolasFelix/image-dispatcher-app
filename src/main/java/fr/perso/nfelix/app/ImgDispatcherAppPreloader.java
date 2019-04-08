@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author N.FELIX
  */
 @Slf4j
-public class ImgDispatcherUIAppPreloader extends Preloader {
+public class ImgDispatcherAppPreloader extends Preloader {
 
   private Stage preloaderStage;
 
