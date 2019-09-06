@@ -1,8 +1,5 @@
 package fr.perso.nfelix.app.ui.utils;
 
-import static fr.perso.nfelix.app.ui.typedef.Constants.CSS_EXTENSION;
-import static fr.perso.nfelix.app.ui.typedef.Constants.STYLES_ROOT;
-
 import fr.perso.nfelix.app.ui.typedef.Constants;
 import fr.perso.nfelix.app.utils.ApplicationHolder;
 import java.awt.*;
@@ -17,9 +14,9 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.web.WebView;
@@ -60,7 +57,7 @@ public abstract class JavaFXUtils {
    * @return {@link Alert}
    */
   public static Alert createDialog(final ResourceBundle resources, Alert.AlertType type, final String titleKey, final String headerKey,
-      final String contentKey) {
+                                   final String contentKey) {
     return createDialog(resources, type, titleKey, headerKey, contentKey, null, null, null, null);
   }
 
@@ -79,7 +76,7 @@ public abstract class JavaFXUtils {
    * @return {@link Alert}
    */
   public static Alert createDialog(final ResourceBundle resources, Alert.AlertType type, final String titleKey, final String headerKey, final String contentKey,
-      Object[] argsTitle, Object[] argsHeader, Object[] argsContent, Throwable th) {
+                                   Object[] argsTitle, Object[] argsHeader, Object[] argsContent, Throwable th) {
 
     String titleMsg = StringUtils.isNotBlank(titleKey) ? getSafeResourceValue(resources, titleKey, argsTitle) : null;
     String headerMsg = StringUtils.isNotBlank(headerKey) ? getSafeResourceValue(resources, headerKey, argsHeader) : null;
@@ -104,7 +101,6 @@ public abstract class JavaFXUtils {
   }
 
   private static void buildDialog(Dialog dlg, String titleMsg, String headerMsg, String contentMsg, Throwable th) {
-
 
     if(StringUtils.isNotBlank(titleMsg)) {
       dlg.setTitle(titleMsg);
@@ -171,7 +167,7 @@ public abstract class JavaFXUtils {
    * @return {@link Alert}
    */
   public static PasswordInputDialog createPasswordDialog(final ResourceBundle resources, final String titleKey, final String headerKey,
-      final String contentKey) {
+                                                         final String contentKey) {
 
     return (PasswordInputDialog) createDialog(new PasswordInputDialog(), resources, titleKey, headerKey, contentKey);
   }
@@ -245,6 +241,7 @@ public abstract class JavaFXUtils {
    * @param <T>            look up class
    * @return first component found (if any)
    */
+  @SuppressWarnings("unchecked")
   public static <T> T getFirstNodeFromComponent(final Parent startComponent, Class<T> expectedClass) {
     T res = null;
     if(startComponent != null) {
@@ -305,16 +302,16 @@ public abstract class JavaFXUtils {
     Notifications notificationBuilder = Notifications.create().title(titleMsg).text(contentMsg).hideAfter(Duration.seconds(5.0)).position(Pos.BOTTOM_RIGHT);
 
     switch( type ) {
-    case INFORMATION:
-      notificationBuilder.showInformation();
-      break;
-    case ERROR:
-      notificationBuilder.showError();
-      break;
-    case WARNING:
-    default:
-      notificationBuilder.showWarning();
-      break;
+      case INFORMATION:
+        notificationBuilder.showInformation();
+        break;
+      case ERROR:
+        notificationBuilder.showError();
+        break;
+      case WARNING:
+      default:
+        notificationBuilder.showWarning();
+        break;
     }
   }
 

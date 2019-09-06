@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -95,7 +96,7 @@ public abstract class AbstractPropertySheetBean implements IPropertySheetBean, C
    * event when folder selection is asked for...
    * called from input {@link FolderNavigationPropertyEditor}
    */
-  public void chooseFolder(ActionEvent ae, CustomBeanProperty beanProp) {
+  public void chooseFolder(ActionEvent ae,  CustomBeanProperty beanProp) {
 
     Button sourceButton = (Button) ae.getSource();
     if(FolderNavigationPropertyEditor.CLEAN_BUTTON_ID.equals(sourceButton.getId())) {
@@ -111,9 +112,10 @@ public abstract class AbstractPropertySheetBean implements IPropertySheetBean, C
     }
     else {
       DirectoryChooser directoryChooser = new DirectoryChooser();
+      // directoryChooser.
       directoryChooser.setInitialDirectory(getInitialFolder(beanProp));
 
-      File selectedDirectory = directoryChooser.showDialog(null);
+      File selectedDirectory = directoryChooser.showDialog(new Stage());
 
       if(selectedDirectory != null) {
         LOGGER.debug("selected folder: '{}'", selectedDirectory.getAbsolutePath());
