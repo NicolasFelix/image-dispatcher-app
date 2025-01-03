@@ -11,13 +11,24 @@
   </organization>
 
   <properties>
-    <lombok.version>1.16.18</lombok.version>
-    <controlsfx.version>8.40.13</controlsfx.version>
-    <springframework.version>4.3.10.RELEASE</springframework.version>
-    <spring.security.version>4.2.3.RELEASE</spring.security.version>
-    <slf4j.version>1.7.25</slf4j.version>
-    <logback.version>1.2.3</logback.version>
-    <janino.version>3.0.7</janino.version>
+    <lombok.version>1.18.24</lombok.version>
+    <controlsfx.version>8.40.18</controlsfx.version>
+    <springframework.version>5.2.9.RELEASE</springframework.version>
+    <spring.security.version>5.4.0</spring.security.version>
+    <slf4j.version>1.7.36</slf4j.version>
+    <logback.version>1.2.11</logback.version>
+    <janino.version>3.1.7</janino.version>
+    <metadata-extractor.version>2.18.0</metadata-extractor.version>
+
+    <google-api-client.version>2.7.1</google-api-client.version>
+    <google-api-services-drive.version>v3-rev20241206-2.0.0</google-api-services-drive.version>
+    <google-oauth-client-jetty.version>1.37.0</google-oauth-client-jetty.version>
+
+    <commons-lang3.version>3.12.0</commons-lang3.version>
+    <commons-configuration2.version>2.7</commons-configuration2.version>
+    <commons-io.version>2.11.0</commons-io.version>
+    <commons-beanutils.version>1.9.4</commons-beanutils.version>
+    <commons-cli.version>1.4</commons-cli.version>
 
     <!-- maven compiler plugin is define into parent -->
     <jdk.version>1.8</jdk.version>
@@ -35,24 +46,14 @@
     <maven.reports.plugin.version>3.0.0</maven.reports.plugin.version>
     <maven-surefire-report-plugin.version>2.22.0</maven-surefire-report-plugin.version>
     <maven.javadoc.plugin.version>3.0.1</maven.javadoc.plugin.version>
-    <maven-dependency-check-maven.version>3.2.1</maven-dependency-check-maven.version>
-    <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
+    <maven-dependency-check-maven.version>5.2.1</maven-dependency-check-maven.version>
+    <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
 
     <!--<kotlin.version>1.0.3</kotlin.version>-->
     <thymeleaf.version>3.0.7.RELEASE</thymeleaf.version>
 
     <javafx-maven-plugin.version>8.8.3</javafx-maven-plugin.version>
     <jre.runtime.path>C:\Program Files\Java\jre1.8.0_201</jre.runtime.path>
-
-    <commons-lang3.version>3.6</commons-lang3.version>
-    <commons-configuration2.version>2.1.1</commons-configuration2.version>
-    <commons-io.version>2.5</commons-io.version>
-    <commons-beanutils.version>1.9.3</commons-beanutils.version>
-    <commons-cli.version>1.4</commons-cli.version>
-
-    <!--<svnkit.version>1.8.14</svnkit.version>-->
-    <metadata-extractor.version>2.10.1</metadata-extractor.version>
-
   </properties>
 
   <build>
@@ -256,18 +257,18 @@
   <reporting>
     <plugins>
       <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>versions-maven-plugin</artifactId>
-      <version>${versions-maven-plugin.version}</version>
-      <reportSets>
-        <reportSet>
-          <reports>
-            <report>dependency-updates-report</report>
-            <report>plugin-updates-report</report>
-          </reports>
-        </reportSet>
-      </reportSets>
-    </plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>${versions-maven-plugin.version}</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependency-updates-report</report>
+              <report>plugin-updates-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
@@ -434,6 +435,23 @@
     </dependency>
 
     <dependency>
+      <groupId>com.google.photos.library</groupId>
+      <artifactId>google-photos-library-client</artifactId>
+      <version>${google-photos-library-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.api-client</groupId>
+      <artifactId>google-api-client</artifactId>
+      <version>${google-api-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.oauth-client</groupId>
+      <artifactId>google-oauth-client-jetty</artifactId>
+      <version>${google-oauth-client-jetty.version}</version>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
@@ -455,6 +473,12 @@
     </dependency>
 
     <!-- LOGGING -->
+    <dependency>
+      <groupId>org.codehaus.janino</groupId>
+      <artifactId>janino</artifactId>
+      <version>2.7.8</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -509,9 +533,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <highlight.engine>highlightjs</highlight.engine>
 
-        <asciidoctor.maven.plugin.version>1.5.5</asciidoctor.maven.plugin.version>
-        <asciidocj.pdf.version>1.5.0-alpha.15</asciidocj.pdf.version>
-        <jruby.version>9.1.12.0</jruby.version>
+        <asciidoctor.maven.plugin.version>2.1.0</asciidoctor.maven.plugin.version>
+        <asciidocj.pdf.version>1.5.3</asciidocj.pdf.version>
+        <jruby.version>9.2.13.0</jruby.version>
       </properties>
 
       <build>

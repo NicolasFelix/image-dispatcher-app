@@ -158,13 +158,6 @@ public class DatabaseConfig extends AbstractPropertySheetBean {
     return null;
   }
 
-  public boolean isFakeMethod() {
-    return true;
-  }
-
-  public void setFakeMethod(boolean value) {
-  }
-
   @SuppressWarnings("EmptyTryBlock")
   public void handleTestMethod(ActionEvent ae, CustomBeanProperty bean) {
 

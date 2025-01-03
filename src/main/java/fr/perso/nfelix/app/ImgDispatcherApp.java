@@ -198,7 +198,7 @@ public class ImgDispatcherApp extends Application {
 
   private void handleShortcut(KeyEvent ke) {
     Node node = appStage.getScene().getFocusOwner();
-    if(node != null && node instanceof Control) {
+    if(node instanceof Control) {
       Control ctrl = (Control) node;
       if(ctrl.getContextMenu() != null) {
         ctrl.getContextMenu().getItems().stream().filter(item -> item.getAccelerator() != null && item.getAccelerator().match(ke)).forEach(item -> {

@@ -15,6 +15,7 @@ import fr.perso.nfelix.app.ui.controllers.IUpdatableUI;
 import fr.perso.nfelix.app.ui.services.utils.CallbackByteChannel;
 import fr.perso.nfelix.app.ui.services.utils.HugeCopyCallback;
 import fr.perso.nfelix.app.utils.ApplicationHolder;
+
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -24,12 +25,15 @@ import java.nio.file.attribute.FileTime;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
 import javafx.concurrent.Task;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +60,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
   private final static DateTimeFormatter DAY_FORMATTER           = DateTimeFormatter.ofPattern("dd");
   private final static DateTimeFormatter FULL_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-  private final static String[] MOVIE_EXT = { "mov", "avi", "mp4", "3gp" };
+  private final static String[] MOVIE_EXT = {"mov", "avi", "mp4", "3gp"};
 
   @Setter
   private ResourceBundle resources;
@@ -201,7 +205,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     LOGGER.debug("shuting down tread pool !!");
     threadPool.shutdown();
     try {
-      if(!threadPool.awaitTermination(10, TimeUnit.MINUTES)) {
+      if(!threadPool.awaitTermination(120, TimeUnit.MINUTES)) {
         LOGGER.info("shuting down tread pool NOW (1) !!");
         threadPool.shutdownNow();
       }
@@ -210,7 +214,8 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
       }
     }
     catch(InterruptedException ex) {
-      LOGGER.warn("shuting down tread pool NOW (1) !!");;
+      LOGGER.warn("shuting down tread pool NOW (1) !!");
+      ;
       threadPool.shutdownNow();
       Thread.currentThread().interrupt();
     }
@@ -356,6 +361,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
       throws IOException {
     LOGGER.debug(">>> getFileList");
     Map<Temporal, List<String>> files = new TreeMap<>();
+    TemporalAdjuster temporalAdjuster = TemporalAdjusters.firstDayOfYear();
 
     Files.walkFileTree(sourceDir, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
       @Override
@@ -364,8 +370,12 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
 
         final String fPath = file.toString();
 
+        if(StringUtils.endsWithAny(fPath, ".json", ".xml")) {
+          return FileVisitResult.CONTINUE;
+        }
+
         FileType fType;
-        try(FileInputStream fis = new FileInputStream(fPath);
+        try(InputStream fis = Files.newInputStream(Paths.get(fPath));
             BufferedInputStream bis = new BufferedInputStream(fis)) {
           fType = FileTypeDetector.detectFileType(bis);
         }
@@ -398,6 +408,7 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
             }
           }
 
+          // Temporal firstDayOfMonth = dayImg.with(temporalAdjuster);
           List<String> subFiles = files.get(dayImg);
           if(subFiles == null) {
             subFiles = new ArrayList<>();
@@ -464,11 +475,11 @@ public class FindAndDispatchImgService extends AbstractThreadedService<Boolean> 
     LOGGER.info("File '{}' already exists but are different ! Renaming it...", FilenameUtils.getName(img));
     String baseName = FilenameUtils.getBaseName(img);
     String extension = "." + FilenameUtils.getExtension(img);
-    synchronized( LOCK ) {
+    synchronized(LOCK) {
       int counter = 0;
       String finalName;
       do {
-        finalName = baseName + "_" + (++counter) + extension;
+        finalName   = baseName + "_" + (++counter) + extension;
         destination = Paths.get(subOut.toString(), finalName);
       }
       while(Files.exists(destination));

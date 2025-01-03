@@ -8,9 +8,12 @@ import fr.perso.nfelix.app.ImgDispatcherApp;
 import fr.perso.nfelix.app.ui.utils.IRootController;
 import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
 import fr.perso.nfelix.app.ui.utils.SpringContextHolder;
+
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -141,7 +144,7 @@ public abstract class AbstractFxController extends Parent implements IFxControll
       }
     }
     catch(Exception e) {
-      LOGGER.error("error while closing spring context: " + e.getLocalizedMessage(), e);
+      LOGGER.error("error while closing spring context: {}", e.getLocalizedMessage(), e);
     }
 
     Platform.exit();
@@ -154,7 +157,7 @@ public abstract class AbstractFxController extends Parent implements IFxControll
         getMainApp().getConfig().save();
       }
       catch(ConfigurationException | IOException e) {
-        LOGGER.error("error while saving settings: " + e.getLocalizedMessage(), e);
+        LOGGER.error("error while saving settings: {}", e.getLocalizedMessage(), e);
       }
     }
   }
@@ -166,15 +169,15 @@ public abstract class AbstractFxController extends Parent implements IFxControll
    */
   public void showUserGuide(ActionEvent ae) {
     Alert dlg = null;
-    Collection<File> userGuidesFiles = FileUtils
-        .listFiles(new File(DispatcherConfig.getExecutionPath()), FileFilterUtils.nameFileFilter(USERGUIDE_FILE, IOCase.INSENSITIVE),
+    Collection<File> userGuidesFiles =
+        FileUtils.listFiles(new File(DispatcherConfig.getExecutionPath()), FileFilterUtils.nameFileFilter(USERGUIDE_FILE, IOCase.INSENSITIVE),
             FileFilterUtils.trueFileFilter());
     if(CollectionUtils.isNotEmpty(userGuidesFiles)) {
       JavaFXUtils.openFile(userGuidesFiles.iterator().next());
     }
     else {
       dlg = createDialog(resources, Alert.AlertType.ERROR, "userguide.file.notfound.title", "userguide.file.notfound.header", null, null,
-          new Object[] { USERGUIDE_FILE }, null, null);
+          new Object[]{USERGUIDE_FILE}, null, null);
     }
     if(dlg != null) {
       dlg.showAndWait();
@@ -189,8 +192,8 @@ public abstract class AbstractFxController extends Parent implements IFxControll
   public void showLogs(ActionEvent ae)
       throws IOException {
     Alert dlg = null;
-    Collection<File> logbackFiles = FileUtils
-        .listFiles(new File(DispatcherConfig.getExecutionPath()), FileFilterUtils.nameFileFilter(LOGBACK_PROPERTY_FILE, IOCase.SENSITIVE),
+    Collection<File> logbackFiles =
+        FileUtils.listFiles(new File(DispatcherConfig.getExecutionPath()), FileFilterUtils.nameFileFilter(LOGBACK_PROPERTY_FILE, IOCase.SENSITIVE),
             FileFilterUtils.trueFileFilter());
 
     if(CollectionUtils.isNotEmpty(logbackFiles)) {
@@ -205,11 +208,11 @@ public abstract class AbstractFxController extends Parent implements IFxControll
       }
 
       Properties props = new Properties();
-      try(FileInputStream fis = new FileInputStream(lf)) {
+      try(InputStream fis = Files.newInputStream(lf.toPath())) {
         props.load(fis);
       }
       catch(FileNotFoundException e) {
-        LOGGER.error("error while opening '" + lf.getAbsolutePath() + "' : " + e.getLocalizedMessage(), e);
+        LOGGER.error("error while opening '{}' : {}", lf.getAbsolutePath(), e.getLocalizedMessage(), e);
       }
       dlg = openOrAlert(props);
     }
@@ -220,7 +223,7 @@ public abstract class AbstractFxController extends Parent implements IFxControll
         props.load(fis);
       }
       catch(FileNotFoundException e) {
-        LOGGER.error("error while opening 'logback.properties' : " + e.getLocalizedMessage(), e);
+        LOGGER.error("error while opening 'logback.properties' : {}", e.getLocalizedMessage(), e);
       }
 
       dlg = openOrAlert(props);
@@ -237,7 +240,7 @@ public abstract class AbstractFxController extends Parent implements IFxControll
       final File dir = new File(logPath);
       if(!dir.exists()) {
         dlg = createDialog(resources, Alert.AlertType.ERROR, "logback.directory.notfound.title", "logback.directory.notfound.header", null, null,
-            new Object[] { logPath }, null, null);
+            new Object[]{logPath}, null, null);
       }
       else {
         Collection<File> logsFiles = FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(LOG_FILE_NAME, IOCase.SENSITIVE), TrueFileFilter.INSTANCE);
@@ -250,7 +253,7 @@ public abstract class AbstractFxController extends Parent implements IFxControll
     }
     else {
       dlg = createDialog(resources, Alert.AlertType.ERROR, "logback.key.notfound.title", "logback.key.notfound.header", null, null,
-          new Object[] { LOGBACK_PROPERTY_FILE, LOGBACK_PATH_KEY }, null, null);
+          new Object[]{LOGBACK_PROPERTY_FILE, LOGBACK_PATH_KEY}, null, null);
     }
     return dlg;
   }
@@ -272,14 +275,14 @@ public abstract class AbstractFxController extends Parent implements IFxControll
       Properties appProps = new Properties();
       appProps.load(fis);
 
-      mavenAppVersion = cleanVersion(appProps.getProperty(VERSION_KEY));
+      mavenAppVersion     = cleanVersion(appProps.getProperty(VERSION_KEY));
       mavenAppBuildNumber = appProps.getProperty(BUILDNUMBER_KEY);
     }
     catch(IOException e) {
-      LOGGER.error("error while reading application.properties file: " + e.getLocalizedMessage(), e);
+      LOGGER.error("error while reading application.properties file: {}", e.getLocalizedMessage(), e);
     }
 
-    mavenAppVersion = checkValue(mavenAppVersion, "ExchangeApp version");
+    mavenAppVersion     = checkValue(mavenAppVersion, "ExchangeApp version");
     mavenAppBuildNumber = checkValue(mavenAppBuildNumber, "ExchangeApp build number");
 
     Alert dlg = createDialog(resources, Alert.AlertType.INFORMATION, "about.title", null, "about.content");

@@ -41,6 +41,10 @@ public abstract class AbstractPropertySheetBean implements IPropertySheetBean, C
 
   protected transient ResourceBundle resources;
 
+  @Getter
+  @Setter
+  private boolean fakeMethod;
+
   /**
    * default hidden constructor
    */
@@ -96,7 +100,7 @@ public abstract class AbstractPropertySheetBean implements IPropertySheetBean, C
    * event when folder selection is asked for...
    * called from input {@link FolderNavigationPropertyEditor}
    */
-  public void chooseFolder(ActionEvent ae,  CustomBeanProperty beanProp) {
+  public void chooseFolder(ActionEvent ae, CustomBeanProperty beanProp) {
 
     Button sourceButton = (Button) ae.getSource();
     if(FolderNavigationPropertyEditor.CLEAN_BUTTON_ID.equals(sourceButton.getId())) {
@@ -167,8 +171,7 @@ public abstract class AbstractPropertySheetBean implements IPropertySheetBean, C
       File initialFolder = getInitialFolder(beanProp);
       fileChooser.setInitialDirectory((initialFolder != null && initialFolder.isDirectory()) ? initialFolder : null);
 
-      fileChooser.getExtensionFilters()
-          .addAll(new FileChooser.ExtensionFilter("Script groovy", "*.groovy"), new FileChooser.ExtensionFilter("Tous les fichiers", "*.*"));
+      fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Tous les fichiers", "*.*"));
       File selectFile = fileChooser.showOpenDialog(null);
 
       if(selectFile != null) {
@@ -221,7 +224,7 @@ public abstract class AbstractPropertySheetBean implements IPropertySheetBean, C
     }
     catch(IllegalAccessException | InvocationTargetException e) {
       LOGGER.error("error while calling method '{}' on bean '{}' ({})", beanProp.getPropertyDescriptor().getReadMethod().getName(),
-          beanProp.getBean().getClass().getSimpleName(), e);
+          beanProp.getBean().getClass().getSimpleName(), e.getLocalizedMessage(), e);
     }
     return null;
   }

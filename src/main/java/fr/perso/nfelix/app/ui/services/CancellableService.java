@@ -4,11 +4,12 @@ import fr.perso.nfelix.app.DispatcherConfig;
 import fr.perso.nfelix.app.exception.ConfigurationException;
 import fr.perso.nfelix.app.ui.controllers.IUpdatableUI;
 import fr.perso.nfelix.app.ui.utils.JavaFXUtils;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.ResourceBundle;
+
 import javafx.concurrent.Service;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -61,8 +62,8 @@ public abstract class CancellableService<V> extends Service<V> {
 
   protected File findFile(final String fileName, final ResourceBundle resources)
       throws ConfigurationException {
-    Collection<File> f = FileUtils
-        .listFiles(new File(DispatcherConfig.getExecutionPath()), FileFilterUtils.nameFileFilter(fileName, IOCase.SENSITIVE), FileFilterUtils.trueFileFilter());
+    Collection<File> f = FileUtils.listFiles(new File(DispatcherConfig.getExecutionPath()), FileFilterUtils.nameFileFilter(fileName, IOCase.SENSITIVE),
+        FileFilterUtils.trueFileFilter());
     if(CollectionUtils.isEmpty(f)) {
       throw new ConfigurationException(JavaFXUtils.getSafeResourceValue(resources, "report.template.not.found", fileName));
     }

@@ -3,19 +3,24 @@ package fr.perso.nfelix.app;
 import static fr.perso.nfelix.app.ui.typedef.Constants.SAVE_PATTERN_DATE;
 
 import fr.perso.nfelix.app.ui.config.GlobalConfig;
+import fr.perso.nfelix.app.ui.config.GoogleConfig;
 import fr.perso.nfelix.app.ui.config.ImportConfig;
 import fr.perso.nfelix.app.ui.typedef.JobConstants;
 import fr.perso.nfelix.app.utils.DFileUtils;
 import fr.perso.nfelix.app.utils.DIOUtils;
 import fr.perso.nfelix.app.utils.DSystemUtils;
 import fr.perso.nfelix.app.utils.fx.AbstractPropertySheetBean;
+
 import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +40,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
  * @author N.FELIX
  */
 @Slf4j
-@EqualsAndHashCode(doNotUseGetters = true, exclude = { "dirty", "preventDirtyChanges", })
+@EqualsAndHashCode(doNotUseGetters = true, exclude = {"dirty", "preventDirtyChanges",})
 public class DispatcherConfig implements Cloneable, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -47,6 +52,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
   private static final String SYSTEM_CONFIG_FOLDER = "config.folder";
 
   private static final String IMPORT_SECTION = "01 - Import";
+  private static final String GOOGLE_SECTION = "02 - Google Photos";
   private static final String GLOBAL_SECTION = "99 - Autres";
 
   private static final String METHOD_GET_PREFIX = "get";
@@ -58,10 +64,13 @@ public class DispatcherConfig implements Cloneable, Serializable {
   private static final String COMMA              = ",";
   private static final String COMMA_SUBSTITUTION = "¤¤";
 
-  private transient ResourceBundle mainResources;
+  private final transient ResourceBundle mainResources;
 
   @Getter
   private ImportConfig importConfig;
+
+  @Getter
+  private GoogleConfig googleConfig;
 
   @Getter
   private GlobalConfig globalConfig;
@@ -99,8 +108,8 @@ public class DispatcherConfig implements Cloneable, Serializable {
     try {
       String path = FilenameUtils.normalizeNoEndSeparator(executionPath);
       if(StringUtils.isBlank(path)) {
-        path = FilenameUtils
-            .normalizeNoEndSeparator(new File(DispatcherConfig.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent());
+        path = FilenameUtils.normalizeNoEndSeparator(
+            new File(DispatcherConfig.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent());
       }
 
       path += File.separatorChar;
@@ -117,17 +126,19 @@ public class DispatcherConfig implements Cloneable, Serializable {
 
     }
     catch(URISyntaxException e) {
-      LOGGER.error("error while getting library path:" + e.getLocalizedMessage(), e);
+      LOGGER.error("error while getting library path:{}", e.getLocalizedMessage(), e);
     }
   }
 
   private void clear() {
     globalConfig = new GlobalConfig(GLOBAL_SECTION, mainResources);
     importConfig = new ImportConfig(IMPORT_SECTION, mainResources);
+    googleConfig = new GoogleConfig(GOOGLE_SECTION, mainResources);
 
     subConfigs = new HashMap<>(2);
     subConfigs.put(GLOBAL_SECTION, globalConfig);
     subConfigs.put(IMPORT_SECTION, importConfig);
+    subConfigs.put(GOOGLE_SECTION, googleConfig);
   }
 
   /**
@@ -143,8 +154,8 @@ public class DispatcherConfig implements Cloneable, Serializable {
       return;
     }
 
-    try(FileInputStream fis = new FileInputStream(iniF);
-        InputStreamReader reader = new InputStreamReader(fis, "UTF8")) {
+    try(InputStream fis = Files.newInputStream(iniF.toPath());
+        InputStreamReader reader = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
       iniFile.read(reader);
     }
     catch(ConfigurationException | IOException e) {
@@ -194,7 +205,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       addSectionFromConfig(iniFile, config);
     }
 
-    try(FileOutputStream fos = new FileOutputStream(iniFileName);
+    try(OutputStream fos = Files.newOutputStream(Paths.get(iniFileName));
         Writer fStream = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
       iniFile.write(fStream);
     }
@@ -210,8 +221,10 @@ public class DispatcherConfig implements Cloneable, Serializable {
     while(keys.hasNext()) {
       String key = keys.next();
 
-      Arrays.stream(config.getPropertyNames()).filter(propName -> StringUtils.equalsIgnoreCase(key, propName)).findFirst().ifPresent(
-          propName -> invokeSetMethod(config, propName,
+      Arrays.stream(config.getPropertyNames())
+          .filter(propName -> StringUtils.equalsIgnoreCase(key, propName))
+          .findFirst()
+          .ifPresent(propName -> invokeSetMethod(config, propName,
               StringUtils.replace(StringUtils.removeEnd(iniSection.getString(key), QUOTE), COMMA_SUBSTITUTION, COMMA)));
     }
 
@@ -224,7 +237,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
 
         final Object value = invokeGetMethod(config, propName);
         Object finalValue = value;
-        if(value != null && value instanceof String) {
+        if(value instanceof String) {
 
           finalValue = StringUtils.replace((String) value, "\r\n", "\n");
           finalValue = StringUtils.replace((String) finalValue, "\n", "  \\\n");
@@ -260,7 +273,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       method.invoke(config, ConvertUtils.convert(value, typeClazz));
     }
     catch(Exception e) {
-      LOGGER.error("invokeSetMethod(" + config + ", " + methodName + ", " + value + "): " + e.getLocalizedMessage(), e);
+      LOGGER.error("invokeSetMethod({}, {}, {}): {}", config, methodName, value, e.getLocalizedMessage(), e);
     }
   }
 
@@ -279,7 +292,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       return method.invoke(bean);
     }
     catch(Exception e) {
-      LOGGER.error("invokeGetMethod(" + bean + ", " + methodName + "): " + e.getLocalizedMessage(), e);
+      LOGGER.error("invokeGetMethod({}, {}): {}", bean, methodName, e.getLocalizedMessage(), e);
     }
     return null;
   }
@@ -300,7 +313,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
     // this can be used while generated extract, to guess header and footer templates
     props.put(JobConstants.SETUP_PATH_KEY, getConfigFolder());
 
-    try(FileOutputStream fos = new FileOutputStream(new File(getConfigFolder(), propertiesFileName))) {
+    try(OutputStream fos = Files.newOutputStream(Paths.get(getConfigFolder(), propertiesFileName))) {
       props.store(fos, " Do not write to this file, it is automatically generated !!!");
     }
     catch(IOException e) {
@@ -316,7 +329,7 @@ public class DispatcherConfig implements Cloneable, Serializable {
       return (DispatcherConfig) super.clone();
     }
     catch(CloneNotSupportedException e) {
-      LOGGER.error("ExchangeConfig clone failed: " + e.getLocalizedMessage(), e);
+      LOGGER.error("ExchangeConfig clone failed: {}", e.getLocalizedMessage(), e);
     }
     return null;
   }

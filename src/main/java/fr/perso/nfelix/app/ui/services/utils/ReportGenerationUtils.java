@@ -2,8 +2,11 @@ package fr.perso.nfelix.app.ui.services.utils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +59,8 @@ public abstract class ReportGenerationUtils {
     resultFilePath += HTML_EXTENSION;
 
     // Merge data-model with template
-    try(FileOutputStream fos = new FileOutputStream(new File(resultFilePath)); Writer fStream = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+    try(OutputStream fos = Files.newOutputStream(Paths.get(resultFilePath));
+        Writer fStream = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
       engine.process(FilenameUtils.getBaseName(templatePath), ctx, fStream);
     }
     finally {
@@ -65,6 +69,7 @@ public abstract class ReportGenerationUtils {
     return resultFilePath;
   }
 
+  @SuppressWarnings("unchecked")
   private static void dumpData(Map<String, Object> data) {
     for(Map.Entry<String, Object> entry : data.entrySet()) {
       LOGGER.info(entry.getKey());

@@ -1,9 +1,8 @@
 package fr.perso.nfelix.app.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,8 @@ public final class DIOUtils {
    */
   public static void copyFile(File f1, File f2) {
 
-    try(FileInputStream fis = new FileInputStream(f1); FileOutputStream fos = new FileOutputStream(f2);) {
+    try(InputStream fis = Files.newInputStream(f1.toPath());
+        OutputStream fos = Files.newOutputStream(f2.toPath())) {
       IOUtils.copy(fis, fos);
     }
     catch(IOException e) {
